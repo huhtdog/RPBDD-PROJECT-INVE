@@ -11,6 +11,9 @@ import {
   Trash2,
   RotateCcw,
   Archive,
+  LogOut,
+  ShieldCheck,
+  Eye,
 } from "lucide-react";
 import { supabase } from "./lib/supabaseClient";
 
@@ -454,6 +457,18 @@ export default function App() {
   const [connStatus, setConnStatus] = useState("checking");
   const [connError, setConnError] = useState("");
 
+  const [session, setSession] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [role, setRole] = useState(null);
+
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+
+  const [authLoading, setAuthLoading] = useState(true);
+
+  const isAdmin = role === "admin" || (profile?.email || session?.user?.email) === "adminrpbdd@gmail.com";
+  const isGuest = role === "guest";
+
   function showMessage(type, text) {
     setMessage({ type, text });
     if (msgTimerRef.current) clearTimeout(msgTimerRef.current);
@@ -461,6 +476,7 @@ export default function App() {
   }
 
   function handleSelectItem(itemId) {
+    if (!isAdmin) return;
     setSelectedItemId(itemId);
     txnSectionRef.current?.scrollIntoView({
       behavior: "smooth",
@@ -469,7 +485,66 @@ export default function App() {
   }
 
   useEffect(() => {
+    async function loadSession() {
+      setAuthLoading(true);
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      setSession(session ?? null);
+      setAuthLoading(false);
+    }
+
+    loadSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session ?? null);
+      setAuthLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    async function loadProfile() {
+      if (!session?.user) {
+        setProfile(null);
+        setRole(null);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, email, role")
+        .eq("id", session.user.id)
+        .single();
+
+      if (error) {
+        console.error("Profile load error:", error);
+        setProfile(null);
+        setRole(null);
+        showMessage("error", "Could not load user profile.");
+        return;
+      }
+
+      setProfile(data);
+      setRole(data.role);
+    }
+
+    loadProfile();
+  }, [session]);
+
+  useEffect(() => {
     async function checkConnection() {
+      if (!session) {
+        setConnStatus("checking");
+        setConnError("");
+        return;
+      }
+
       setConnStatus("checking");
       setConnError("");
 
@@ -486,9 +561,60 @@ export default function App() {
     }
 
     checkConnection();
-  }, []);
+  }, [session]);
+
+  async function handleLogin(e) {
+    e.preventDefault();
+
+    const email = loginEmail.trim();
+    const password = loginPassword;
+
+    if (!email || !password) {
+      return showMessage("error", "Email and password are required.");
+    }
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      console.error("Login error:", error);
+      return showMessage("error", error.message);
+    }
+
+    setLoginPassword("");
+    showMessage("ok", "Logged in successfully.");
+  }
+
+  async function handleLogout() {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("Logout error:", error);
+      return showMessage("error", error.message);
+    }
+
+    setProfile(null);
+    setRole(null);
+    setItems([]);
+    setDeletedItems([]);
+    setTxns([]);
+    setSelectedItemId("");
+    setLoginEmail("");
+    setLoginPassword("");
+    showMessage("ok", "Logged out.");
+  }
 
   async function refreshData(preferSelectedId) {
+    if (!session) {
+      setItems([]);
+      setDeletedItems([]);
+      setTxns([]);
+      setSelectedItemId("");
+      return;
+    }
+
     const { data: itemsData, error: itemsErr } = await supabase
       .from("items")
       .select("*")
@@ -497,13 +623,17 @@ export default function App() {
 
     if (itemsErr) return showMessage("error", itemsErr.message);
 
-    const { data: deletedItemsData, error: deletedItemsErr } = await supabase
-      .from("items")
-      .select("*")
-      .not("deleted_at", "is", null)
-      .order("deleted_at", { ascending: false });
+    let deletedItemsData = [];
+    if (isAdmin) {
+      const { data, error } = await supabase
+        .from("items")
+        .select("*")
+        .not("deleted_at", "is", null)
+        .order("deleted_at", { ascending: false });
 
-    if (deletedItemsErr) return showMessage("error", deletedItemsErr.message);
+      if (error) return showMessage("error", error.message);
+      deletedItemsData = data ?? [];
+    }
 
     const { data: txnsData, error: txnsErr } = await supabase
       .from("txns")
@@ -514,7 +644,7 @@ export default function App() {
     if (txnsErr) return showMessage("error", txnsErr.message);
 
     setItems(itemsData ?? []);
-    setDeletedItems(deletedItemsData ?? []);
+    setDeletedItems(deletedItemsData);
     setTxns(txnsData ?? []);
 
     const nextSelected =
@@ -522,16 +652,25 @@ export default function App() {
         ? preferSelectedId
         : itemsData?.[0]?.id ?? "";
 
-    setSelectedItemId(nextSelected);
+    setSelectedItemId(isAdmin ? nextSelected : "");
   }
 
-  useEffect(() => {
-    refreshData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+useEffect(() => {
+  if (!session) {
+    setItems([]);
+    setDeletedItems([]);
+    setTxns([]);
+    setSelectedItemId("");
+    return;
+  }
+
+  refreshData();
+}, [session, role]);
 
   async function addItem(e) {
     e.preventDefault();
+
+    if (!isAdmin) return showMessage("error", "Only admin can add items.");
 
     const name = normalizeName(newName);
     const unit =
@@ -597,6 +736,7 @@ export default function App() {
   async function applyTxn(e) {
     e.preventDefault();
 
+    if (!isAdmin) return showMessage("error", "Only admin can save transactions.");
     if (!selectedItemId) return showMessage("error", "Please select an item.");
 
     const qty = toNumber(txnQty);
@@ -626,6 +766,8 @@ export default function App() {
   }
 
   async function deleteItem(itemId) {
+    if (!isAdmin) return showMessage("error", "Only admin can recycle items.");
+
     const item = items.find((it) => it.id === itemId);
     if (!item) return;
 
@@ -653,6 +795,8 @@ export default function App() {
   }
 
   async function restoreItem(itemId) {
+    if (!isAdmin) return showMessage("error", "Only admin can restore items.");
+
     const item = deletedItems.find((it) => it.id === itemId);
     if (!item) return;
 
@@ -675,6 +819,10 @@ export default function App() {
   }
 
   async function deleteForever(itemId) {
+    if (!isAdmin) {
+      return showMessage("error", "Only admin can delete permanently.");
+    }
+
     const item = deletedItems.find((it) => it.id === itemId);
     if (!item) return;
 
@@ -692,6 +840,8 @@ export default function App() {
   }
 
   async function clearAll() {
+    if (!isAdmin) return showMessage("error", "Only admin can recycle all data.");
+
     const yes = window.confirm("Move ALL items and transactions to Recycle Bin?");
     if (!yes) return;
 
@@ -774,6 +924,89 @@ export default function App() {
         ? "DB: ERROR"
         : "DB: CHECKING";
 
+  if (authLoading) {
+    return (
+      <div style={styles.page}>
+        <div style={styles.shell}>
+          <div
+            style={{
+              ...styles.card,
+              maxWidth: 460,
+              margin: "80px auto",
+              textAlign: "center",
+            }}
+          >
+            Loading...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div style={styles.page}>
+        <div style={styles.shell}>
+          <motion.div
+            style={styles.hero}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45 }}
+          >
+            <div style={styles.heroGlow} />
+            <h1 style={styles.heroTitle}>RPBDD SUPPLIES</h1>
+          </motion.div>
+
+          <div
+            style={{
+              ...styles.card,
+              maxWidth: 460,
+              margin: "0 auto",
+            }}
+          >
+            <h2 style={styles.cardTitle}>
+              <ShieldCheck size={18} />
+              Login
+            </h2>
+
+            {message?.type === "error" && <div style={styles.error}>{message.text}</div>}
+            {message?.type === "ok" && <div style={styles.ok}>{message.text}</div>}
+
+            <form onSubmit={handleLogin}>
+              <div style={styles.field}>
+                <div style={styles.label}>Email</div>
+                <input
+                  style={styles.input}
+                  type="email"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="Enter your email"
+                />
+              </div>
+
+              <div style={styles.field}>
+                <div style={styles.label}>Password</div>
+                <input
+                  style={styles.input}
+                  type="password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="Enter your password"
+                />
+              </div>
+
+              <div style={styles.buttonRow}>
+                <FancyButton type="submit" style={styles.btnPrimary} icon={<ShieldCheck size={16} />}>
+                  Login
+                </FancyButton>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={styles.page}>
       <div style={styles.shell}>
@@ -803,9 +1036,16 @@ export default function App() {
               Low stock: {lowCount}
             </span>
 
+            {isAdmin && (
+              <span style={styles.statsPill}>
+                <Archive size={14} />
+                Bin: {deletedItems.length}
+              </span>
+            )}
+
             <span style={styles.statsPill}>
-              <Archive size={14} />
-              Bin: {deletedItems.length}
+              {isAdmin ? <ShieldCheck size={14} /> : <Eye size={14} />}
+              Role: {role || "unknown"}
             </span>
           </div>
         </motion.div>
@@ -814,22 +1054,36 @@ export default function App() {
           <div style={styles.headerLeft}>
             <div style={styles.headerTopRow}>
               <h1 style={styles.h1}>RPBDD SUPPLIES INVENTORY SYSTEM</h1>
+              <span style={styles.badge}>
+                {profile?.email || session.user.email} • {isAdmin ? "admin" : isGuest ? "guest" : "user"}
+              </span>
             </div>
 
             <div style={styles.subtle}>
-              Manual input of supplies. Stock-out automatically subtracts quantity.
-              {lowCount > 0 ? ` • Low stock alerts: ${lowCount}` : ""}
+              {isAdmin
+                ? `Manual input of supplies. Stock-out automatically subtracts quantity.${lowCount > 0 ? ` • Low stock alerts: ${lowCount}` : ""}`
+                : "Guest view: you can view items and transaction history only."}
             </div>
           </div>
 
           <div style={styles.buttonRow}>
+            {isAdmin && (
+              <FancyButton
+                style={styles.btnWarning}
+                onClick={clearAll}
+                title="Move all data to recycle bin"
+                icon={<Archive size={16} />}
+              >
+                Recycle All
+              </FancyButton>
+            )}
+
             <FancyButton
-              style={styles.btnWarning}
-              onClick={clearAll}
-              title="Move all data to recycle bin"
-              icon={<Archive size={16} />}
+              style={styles.btn}
+              onClick={handleLogout}
+              icon={<LogOut size={16} />}
             >
-              Recycle All
+              Logout
             </FancyButton>
           </div>
         </div>
@@ -838,175 +1092,179 @@ export default function App() {
         {message?.type === "ok" && <div style={styles.ok}>{message.text}</div>}
 
         <div style={styles.grid}>
-          <motion.div
-            style={styles.card}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.05 }}
-          >
-            <h2 style={styles.cardTitle}>
-              <Plus size={18} />
-              Add Supply
-            </h2>
+          {isAdmin && (
+            <motion.div
+              style={styles.card}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.05 }}
+            >
+              <h2 style={styles.cardTitle}>
+                <Plus size={18} />
+                Add Supply
+              </h2>
 
-            <form onSubmit={addItem}>
-              <div style={styles.field}>
-                <div style={styles.label}>Item name</div>
-                <input
-                  style={styles.input}
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  placeholder="Bond Paper"
-                />
-              </div>
-
-              <div style={styles.row}>
+              <form onSubmit={addItem}>
                 <div style={styles.field}>
-                  <div style={styles.label}>Initial quantity</div>
+                  <div style={styles.label}>Item name</div>
                   <input
                     style={styles.input}
-                    value={newQty}
-                    onChange={(e) => setNewQty(digitsOnly(e.target.value))}
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    placeholder="Bond Paper"
+                  />
+                </div>
+
+                <div style={styles.row}>
+                  <div style={styles.field}>
+                    <div style={styles.label}>Initial quantity</div>
+                    <input
+                      style={styles.input}
+                      value={newQty}
+                      onChange={(e) => setNewQty(digitsOnly(e.target.value))}
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      placeholder="0"
+                    />
+                  </div>
+
+                  <div style={styles.field}>
+                    <div style={styles.label}>Unit</div>
+                    <select
+                      style={styles.select}
+                      value={newUnit}
+                      onChange={(e) => setNewUnit(e.target.value)}
+                    >
+                      {UNIT_OPTIONS.map((unit) => (
+                        <option key={unit} value={unit}>
+                          {unit === "others" ? "Others" : unit}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {newUnit === "others" && (
+                  <div style={styles.field}>
+                    <div style={styles.label}>Specify unit</div>
+                    <input
+                      style={styles.input}
+                      value={customUnit}
+                      onChange={(e) => setCustomUnit(e.target.value)}
+                      placeholder="e.g., tray"
+                    />
+                  </div>
+                )}
+
+                <div style={styles.field}>
+                  <div style={styles.label}>Low stock threshold</div>
+                  <input
+                    style={styles.input}
+                    value={newMin}
+                    onChange={(e) => setNewMin(digitsOnly(e.target.value))}
                     inputMode="numeric"
                     pattern="[0-9]*"
                     placeholder="0"
                   />
                 </div>
 
+                <div style={styles.buttonRow}>
+                  <FancyButton
+                    style={styles.btnPrimary}
+                    type="submit"
+                    icon={<Plus size={16} />}
+                  >
+                    Add Item
+                  </FancyButton>
+                </div>
+              </form>
+            </motion.div>
+          )}
+
+          {isAdmin && (
+            <motion.div
+              ref={txnSectionRef}
+              style={styles.card}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.1 }}
+            >
+              <h2 style={styles.cardTitle}>
+                <ArrowDownUp size={18} />
+                Release / Stock In
+              </h2>
+
+              <form onSubmit={applyTxn}>
                 <div style={styles.field}>
-                  <div style={styles.label}>Unit</div>
+                  <div style={styles.label}>Select item</div>
                   <select
                     style={styles.select}
-                    value={newUnit}
-                    onChange={(e) => setNewUnit(e.target.value)}
+                    value={selectedItemId}
+                    onChange={(e) => setSelectedItemId(e.target.value)}
                   >
-                    {UNIT_OPTIONS.map((unit) => (
-                      <option key={unit} value={unit}>
-                        {unit === "others" ? "Others" : unit}
+                    <option value="" disabled>
+                      -- choose item --
+                    </option>
+                    {items.map((it) => (
+                      <option key={it.id} value={it.id}>
+                        {it.name} ({it.quantity} {it.unit})
                       </option>
                     ))}
                   </select>
                 </div>
-              </div>
 
-              {newUnit === "others" && (
+                <div style={styles.row}>
+                  <div style={styles.field}>
+                    <div style={styles.label}>Transaction</div>
+                    <select
+                      style={styles.select}
+                      value={txnType}
+                      onChange={(e) => setTxnType(e.target.value)}
+                    >
+                      <option value="OUT">Stock Out (Release)</option>
+                      <option value="IN">Stock In (Add)</option>
+                    </select>
+                  </div>
+
+                  <div style={styles.field}>
+                    <div style={styles.label}>Quantity</div>
+                    <input
+                      style={styles.input}
+                      value={txnQty}
+                      onChange={(e) => setTxnQty(digitsOnly(e.target.value))}
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      placeholder="e.g., 50"
+                    />
+                  </div>
+                </div>
+
                 <div style={styles.field}>
-                  <div style={styles.label}>Specify unit</div>
+                  <div style={styles.label}>Note</div>
                   <input
                     style={styles.input}
-                    value={customUnit}
-                    onChange={(e) => setCustomUnit(e.target.value)}
-                    placeholder="e.g., tray"
+                    value={txnNote}
+                    onChange={(e) => setTxnNote(e.target.value)}
+                    placeholder='e.g., "Used for printing"'
                   />
                 </div>
-              )}
 
-              <div style={styles.field}>
-                <div style={styles.label}>Low stock threshold</div>
-                <input
-                  style={styles.input}
-                  value={newMin}
-                  onChange={(e) => setNewMin(digitsOnly(e.target.value))}
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  placeholder="0"
-                />
-              </div>
-
-              <div style={styles.buttonRow}>
-                <FancyButton
-                  style={styles.btnPrimary}
-                  type="submit"
-                  icon={<Plus size={16} />}
-                >
-                  Add Item
-                </FancyButton>
-              </div>
-            </form>
-          </motion.div>
-
-          <motion.div
-            ref={txnSectionRef}
-            style={styles.card}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.1 }}
-          >
-            <h2 style={styles.cardTitle}>
-              <ArrowDownUp size={18} />
-              Release / Stock In
-            </h2>
-
-            <form onSubmit={applyTxn}>
-              <div style={styles.field}>
-                <div style={styles.label}>Select item</div>
-                <select
-                  style={styles.select}
-                  value={selectedItemId}
-                  onChange={(e) => setSelectedItemId(e.target.value)}
-                >
-                  <option value="" disabled>
-                    -- choose item --
-                  </option>
-                  {items.map((it) => (
-                    <option key={it.id} value={it.id}>
-                      {it.name} ({it.quantity} {it.unit})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={styles.row}>
-                <div style={styles.field}>
-                  <div style={styles.label}>Transaction</div>
-                  <select
-                    style={styles.select}
-                    value={txnType}
-                    onChange={(e) => setTxnType(e.target.value)}
+                <div style={styles.buttonRow}>
+                  <FancyButton
+                    style={styles.btnPrimary}
+                    type="submit"
+                    icon={<ArrowDownUp size={16} />}
                   >
-                    <option value="OUT">Stock Out (Release)</option>
-                    <option value="IN">Stock In (Add)</option>
-                  </select>
+                    Save Transaction
+                  </FancyButton>
                 </div>
+              </form>
 
-                <div style={styles.field}>
-                  <div style={styles.label}>Quantity</div>
-                  <input
-                    style={styles.input}
-                    value={txnQty}
-                    onChange={(e) => setTxnQty(digitsOnly(e.target.value))}
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    placeholder="e.g., 50"
-                  />
-                </div>
+              <div style={styles.helperText}>
+                Example: If you added <b>100</b> then Stock Out <b>50</b>, remaining becomes <b>50</b>.
               </div>
-
-              <div style={styles.field}>
-                <div style={styles.label}>Note</div>
-                <input
-                  style={styles.input}
-                  value={txnNote}
-                  onChange={(e) => setTxnNote(e.target.value)}
-                  placeholder='e.g., "Used for printing"'
-                />
-              </div>
-
-              <div style={styles.buttonRow}>
-                <FancyButton
-                  style={styles.btnPrimary}
-                  type="submit"
-                  icon={<ArrowDownUp size={16} />}
-                >
-                  Save Transaction
-                </FancyButton>
-              </div>
-            </form>
-
-            <div style={styles.helperText}>
-              Example: If you added <b>100</b> then Stock Out <b>50</b>, remaining becomes <b>50</b>.
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
 
           <motion.div
             style={{ ...styles.card, ...styles.cardFull }}
@@ -1088,23 +1346,29 @@ export default function App() {
                           <td style={styles.td}>{formatDate(it.updated_at)}</td>
                           <td style={styles.td}>
                             <div style={styles.buttonRow}>
-                              <FancyButton
-                                type="button"
-                                style={styles.btn}
-                                onClick={() => handleSelectItem(it.id)}
-                                icon={<Activity size={15} />}
-                              >
-                                Select
-                              </FancyButton>
+                              {isAdmin ? (
+                                <>
+                                  <FancyButton
+                                    type="button"
+                                    style={styles.btn}
+                                    onClick={() => handleSelectItem(it.id)}
+                                    icon={<Activity size={15} />}
+                                  >
+                                    Select
+                                  </FancyButton>
 
-                              <FancyButton
-                                type="button"
-                                style={styles.btnWarning}
-                                onClick={() => deleteItem(it.id)}
-                                icon={<Archive size={15} />}
-                              >
-                                Recycle
-                              </FancyButton>
+                                  <FancyButton
+                                    type="button"
+                                    style={styles.btnWarning}
+                                    onClick={() => deleteItem(it.id)}
+                                    icon={<Archive size={15} />}
+                                  >
+                                    Recycle
+                                  </FancyButton>
+                                </>
+                              ) : (
+                                <span style={styles.badge}>View only</span>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -1116,95 +1380,97 @@ export default function App() {
             </div>
           </motion.div>
 
-          <motion.div
-            style={{ ...styles.card, ...styles.cardFull }}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.18 }}
-          >
-            <h2 style={styles.cardTitle}>
-              <Archive size={18} />
-              Recycle Bin
-            </h2>
+          {isAdmin && (
+            <motion.div
+              style={{ ...styles.card, ...styles.cardFull }}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.18 }}
+            >
+              <h2 style={styles.cardTitle}>
+                <Archive size={18} />
+                Recycle Bin
+              </h2>
 
-            <div style={styles.row}>
-              <div style={styles.field}>
-                <div style={styles.label}>Search deleted items</div>
-                <div style={{ position: "relative" }}>
-                  <Search
-                    size={16}
-                    style={{
-                      position: "absolute",
-                      left: 14,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      color: "#64748b",
-                    }}
-                  />
-                  <input
-                    style={{ ...styles.input, paddingLeft: 40 }}
-                    value={binSearch}
-                    onChange={(e) => setBinSearch(e.target.value)}
-                    placeholder="Search deleted item name..."
-                  />
+              <div style={styles.row}>
+                <div style={styles.field}>
+                  <div style={styles.label}>Search deleted items</div>
+                  <div style={{ position: "relative" }}>
+                    <Search
+                      size={16}
+                      style={{
+                        position: "absolute",
+                        left: 14,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        color: "#64748b",
+                      }}
+                    />
+                    <input
+                      style={{ ...styles.input, paddingLeft: 40 }}
+                      value={binSearch}
+                      onChange={(e) => setBinSearch(e.target.value)}
+                      placeholder="Search deleted item name..."
+                    />
+                  </div>
                 </div>
+                <div />
               </div>
-              <div />
-            </div>
 
-            <div style={styles.tableWrap}>
-              <table style={styles.table}>
-                <thead>
-                  <tr>
-                    <th style={styles.th}>Name</th>
-                    <th style={styles.th}>Qty</th>
-                    <th style={styles.th}>Unit</th>
-                    <th style={styles.th}>Deleted</th>
-                    <th style={styles.th}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredDeletedItems.length === 0 ? (
+              <div style={styles.tableWrap}>
+                <table style={styles.table}>
+                  <thead>
                     <tr>
-                      <td style={styles.td} colSpan={5}>
-                        Recycle Bin is empty.
-                      </td>
+                      <th style={styles.th}>Name</th>
+                      <th style={styles.th}>Qty</th>
+                      <th style={styles.th}>Unit</th>
+                      <th style={styles.th}>Deleted</th>
+                      <th style={styles.th}>Actions</th>
                     </tr>
-                  ) : (
-                    filteredDeletedItems.map((it) => (
-                      <tr key={it.id}>
-                        <td style={styles.td}>{it.name}</td>
-                        <td style={styles.td}>{it.quantity}</td>
-                        <td style={styles.td}>{it.unit}</td>
-                        <td style={styles.td}>{formatDate(it.deleted_at)}</td>
-                        <td style={styles.td}>
-                          <div style={styles.buttonRow}>
-                            <FancyButton
-                              type="button"
-                              style={styles.btnPrimary}
-                              onClick={() => restoreItem(it.id)}
-                              icon={<RotateCcw size={15} />}
-                            >
-                              Restore
-                            </FancyButton>
-
-                            <FancyButton
-                              type="button"
-                              style={styles.btnDanger}
-                              onClick={() => deleteForever(it.id)}
-                              icon={<Trash2 size={15} />}
-                            >
-                              Delete Forever
-                            </FancyButton>
-                          </div>
+                  </thead>
+                  <tbody>
+                    {filteredDeletedItems.length === 0 ? (
+                      <tr>
+                        <td style={styles.td} colSpan={5}>
+                          Recycle Bin is empty.
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </motion.div>
+                    ) : (
+                      filteredDeletedItems.map((it) => (
+                        <tr key={it.id}>
+                          <td style={styles.td}>{it.name}</td>
+                          <td style={styles.td}>{it.quantity}</td>
+                          <td style={styles.td}>{it.unit}</td>
+                          <td style={styles.td}>{formatDate(it.deleted_at)}</td>
+                          <td style={styles.td}>
+                            <div style={styles.buttonRow}>
+                              <FancyButton
+                                type="button"
+                                style={styles.btnPrimary}
+                                onClick={() => restoreItem(it.id)}
+                                icon={<RotateCcw size={15} />}
+                              >
+                                Restore
+                              </FancyButton>
+
+                              <FancyButton
+                                type="button"
+                                style={styles.btnDanger}
+                                onClick={() => deleteForever(it.id)}
+                                icon={<Trash2 size={15} />}
+                              >
+                                Delete Forever
+                              </FancyButton>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+          )}
 
           <motion.div
             style={{ ...styles.card, ...styles.cardFull }}
