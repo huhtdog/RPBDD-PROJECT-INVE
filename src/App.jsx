@@ -14,8 +14,25 @@ import {
   Archive,
   LogOut,
   ShieldCheck,
+  Home,
+  Filter,
+  Clock,
+  X,
+  Upload,
+  Download,
+  FileSpreadsheet,
+  FileText,
+  CheckSquare,
+  Square,
+  Trash,
+  RefreshCw,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { supabase } from "./lib/supabaseClient";
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 function toNumber(value) {
   const n = Number(value);
@@ -77,410 +94,618 @@ function FancyButton({ children, style, icon, ...props }) {
   );
 }
 
-const styles = {
-  page: {
-    minHeight: "100vh",
-    fontFamily:
-      'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"',
-    background:
-      "radial-gradient(circle at top left, rgba(255,255,255,0.10), transparent 22%), linear-gradient(180deg, #0f3d1e 0%, #17612b 38%, #2f8f3a 100%)",
-    color: "#ffffff",
-    padding: 20,
+// Theme configuration
+const themes = {
+  dark: {
+    page: {
+      background: "radial-gradient(circle at top left, rgba(255,255,255,0.10), transparent 22%), linear-gradient(180deg, #0f3d1e 0%, #17612b 38%, #2f8f3a 100%)",
+      color: "#ffffff",
+    },
+    hero: {
+      background: "linear-gradient(135deg, rgba(7,28,14,0.42), rgba(255,255,255,0.04))",
+      border: "1px solid rgba(255,255,255,0.14)",
+    },
+    card: {
+      background: "rgba(8, 30, 15, 0.24)",
+      border: "1px solid rgba(255,255,255,0.12)",
+    },
+    input: {
+      background: "rgba(255,255,255,0.94)",
+      color: "#0f172a",
+    },
+    text: "#ffffff",
+    textSecondary: "rgba(255,255,255,0.78)",
+    border: "rgba(255,255,255,0.12)",
+    badgeBg: "rgba(7, 28, 14, 0.22)",
+    filterBg: "rgba(8, 30, 15, 0.24)",
   },
-
-  shell: {
-    maxWidth: 1280,
-    margin: "0 auto",
-  },
-
-  hero: {
-    position: "relative",
-    overflow: "hidden",
-    borderRadius: 30,
-    padding: "28px 28px 34px",
-    marginBottom: 18,
-    background:
-      "linear-gradient(135deg, rgba(7,28,14,0.42), rgba(255,255,255,0.04))",
-    border: "1px solid rgba(255,255,255,0.14)",
-    boxShadow: "0 24px 70px rgba(0,0,0,0.28)",
-    backdropFilter: "blur(14px)",
-  },
-
-  heroGlow: {
-    position: "absolute",
-    right: -80,
-    top: -80,
-    width: 280,
-    height: 280,
-    borderRadius: "50%",
-    background: "rgba(255,255,255,0.05)",
-    filter: "blur(24px)",
-    pointerEvents: "none",
-  },
-
-  heroTitle: {
-    margin: 0,
-    fontSize: "clamp(44px, 10vw, 118px)",
-    lineHeight: 0.88,
-    fontWeight: 900,
-    letterSpacing: "-0.06em",
-    textTransform: "uppercase",
-    color: "rgba(255,255,255,0.92)",
-    position: "relative",
-    zIndex: 1,
-  },
-
-  heroMetaRow: {
-    marginTop: 18,
-    display: "flex",
-    gap: 10,
-    flexWrap: "wrap",
-    alignItems: "center",
-    position: "relative",
-    zIndex: 1,
-  },
-
-  statsPill: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "8px 14px",
-    borderRadius: 999,
-    background: "rgba(7, 28, 14, 0.26)",
-    border: "1px solid rgba(255,255,255,0.12)",
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: 700,
-    letterSpacing: "0.04em",
-    textTransform: "uppercase",
-    backdropFilter: "blur(8px)",
-  },
-
-  statsPillButton: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "8px 14px",
-    borderRadius: 999,
-    background: "rgba(7, 28, 14, 0.26)",
-    border: "1px solid rgba(255,255,255,0.12)",
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: 700,
-    letterSpacing: "0.04em",
-    textTransform: "uppercase",
-    backdropFilter: "blur(8px)",
-    cursor: "pointer",
-  },
-
-  header: {
-    display: "flex",
-    gap: 12,
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    flexWrap: "wrap",
-    marginBottom: 16,
-  },
-
-  h1: {
-    margin: 0,
-    fontSize: 28,
-    color: "#ffffff",
-    letterSpacing: "-0.03em",
-  },
-
-  subtle: {
-    color: "rgba(255,255,255,0.78)",
-    fontSize: 13,
-    marginTop: 6,
-  },
-
-  headerLeft: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 6,
-  },
-
-  headerTopRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    flexWrap: "wrap",
-  },
-
-  badge: {
-    display: "inline-block",
-    padding: "6px 12px",
-    borderRadius: 999,
-    fontSize: 12,
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(7, 28, 14, 0.22)",
-    color: "#fff",
-    userSelect: "none",
-    backdropFilter: "blur(8px)",
-  },
-
-  badgeOk: {
-    border: "1px solid rgba(134,239,172,0.40)",
-    background: "rgba(22,163,74,0.20)",
-    color: "#f0fdf4",
-  },
-
-  badgeErr: {
-    border: "1px solid rgba(252,165,165,0.45)",
-    background: "rgba(220,38,38,0.20)",
-    color: "#fff1f2",
-  },
-
-  badgeChecking: {
-    border: "1px solid rgba(125,211,252,0.40)",
-    background: "rgba(2,132,199,0.20)",
-    color: "#f0f9ff",
-  },
-
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-    gap: 16,
-    alignItems: "start",
-  },
-
-  card: {
-    border: "1px solid rgba(255,255,255,0.12)",
-    borderRadius: 24,
-    padding: 18,
-    boxShadow: "0 20px 50px rgba(0,0,0,0.20)",
-    background: "rgba(8, 30, 15, 0.24)",
-    backdropFilter: "blur(14px)",
-    color: "#fff",
-  },
-
-  cardFull: {
-    gridColumn: "1 / -1",
-  },
-
-  cardTitle: {
-    margin: "0 0 12px 0",
-    fontSize: 18,
-    fontWeight: 800,
-    color: "#fff",
-    letterSpacing: "-0.02em",
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-  },
-
-  row: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: 12,
-  },
-
-  field: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    marginBottom: 12,
-  },
-
-  label: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.82)",
-    textTransform: "uppercase",
-    letterSpacing: "0.08em",
-  },
-
-  input: {
-    padding: "12px 14px",
-    borderRadius: 16,
-    border: "1px solid rgba(255,255,255,0.18)",
-    outline: "none",
-    background: "rgba(255,255,255,0.94)",
-    color: "#0f172a",
-    fontSize: 14,
-  },
-
-  select: {
-    padding: "12px 14px",
-    borderRadius: 16,
-    border: "1px solid rgba(255,255,255,0.18)",
-    outline: "none",
-    background: "rgba(255,255,255,0.94)",
-    color: "#0f172a",
-    fontSize: 14,
-  },
-
-  buttonRow: {
-    display: "flex",
-    gap: 10,
-    flexWrap: "wrap",
-    marginTop: 8,
-  },
-
-  btn: {
-    padding: "11px 18px",
-    borderRadius: 999,
-    border: "1px solid rgba(255,255,255,0.16)",
-    background: "rgba(7, 28, 14, 0.28)",
-    color: "#fff",
-    cursor: "pointer",
-    fontWeight: 800,
-    letterSpacing: "0.04em",
-    textTransform: "uppercase",
-    transition: "all 0.2s ease",
-    backdropFilter: "blur(10px)",
-  },
-
-  btnPrimary: {
-    padding: "11px 18px",
-    borderRadius: 999,
-    border: "1px solid rgba(255,255,255,0.18)",
-    background: "linear-gradient(180deg, #dff7cf 0%, #8fcd67 100%)",
-    color: "#12361c",
-    cursor: "pointer",
-    fontWeight: 900,
-    letterSpacing: "0.04em",
-    textTransform: "uppercase",
-    boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
-  },
-
-  btnDanger: {
-    padding: "11px 18px",
-    borderRadius: 999,
-    border: "1px solid rgba(254,202,202,0.34)",
-    background: "linear-gradient(180deg, #dc2626 0%, #991b1b 100%)",
-    color: "#fff",
-    cursor: "pointer",
-    fontWeight: 900,
-    letterSpacing: "0.04em",
-    textTransform: "uppercase",
-    boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
-  },
-
-  btnWarning: {
-    padding: "11px 18px",
-    borderRadius: 999,
-    border: "1px solid rgba(253,224,71,0.34)",
-    background: "linear-gradient(180deg, #f59e0b 0%, #b45309 100%)",
-    color: "#fff",
-    cursor: "pointer",
-    fontWeight: 900,
-    letterSpacing: "0.04em",
-    textTransform: "uppercase",
-    boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
-  },
-
-  tableWrap: {
-    overflowX: "auto",
-    borderRadius: 18,
-    background: "rgba(6, 22, 11, 0.20)",
-    border: "1px solid rgba(255,255,255,0.08)",
-  },
-
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-
-  th: {
-    textAlign: "left",
-    fontSize: 12,
-    color: "rgba(255,255,255,0.76)",
-    borderBottom: "1px solid rgba(255,255,255,0.10)",
-    padding: "12px 10px",
-    whiteSpace: "nowrap",
-    textTransform: "uppercase",
-    letterSpacing: "0.06em",
-  },
-
-  td: {
-    borderBottom: "1px solid rgba(255,255,255,0.07)",
-    padding: "12px 10px",
-    fontSize: 13,
-    color: "#fff",
-    verticalAlign: "middle",
-  },
-
-  badgeLow: {
-    display: "inline-block",
-    padding: "4px 10px",
-    borderRadius: 999,
-    fontSize: 12,
-    border: "1px solid rgba(254,202,202,0.42)",
-    background: "rgba(127,29,29,0.28)",
-    color: "#fff1f2",
-  },
-
-  error: {
-    background: "rgba(127,29,29,0.35)",
-    border: "1px solid rgba(252,165,165,0.30)",
-    padding: 12,
-    borderRadius: 16,
-    color: "#fff1f2",
-    marginBottom: 12,
-    fontSize: 13,
-    backdropFilter: "blur(8px)",
-  },
-
-  ok: {
-    background: "rgba(6,95,70,0.30)",
-    border: "1px solid rgba(110,231,183,0.28)",
-    padding: 12,
-    borderRadius: 16,
-    color: "#ecfdf5",
-    marginBottom: 12,
-    fontSize: 13,
-    backdropFilter: "blur(8px)",
-  },
-
-  footer: {
-    marginTop: 16,
-    color: "rgba(255,255,255,0.74)",
-    fontSize: 12,
-  },
-
-  helperText: {
-    color: "rgba(255,255,255,0.76)",
-    fontSize: 13,
-    marginTop: 10,
-    lineHeight: 1.6,
-  },
-
-  scrollTopButton: {
-    position: "fixed",
-    right: 20,
-    bottom: 20,
-    width: 52,
-    height: 52,
-    borderRadius: "50%",
-    border: "1px solid rgba(255,255,255,0.18)",
-    background: "linear-gradient(180deg, #dff7cf 0%, #8fcd67 100%)",
-    color: "#12361c",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
-    zIndex: 999,
+  light: {
+    page: {
+      background: "linear-gradient(135deg, #f5f7fa 0%, #e8f0e8 100%)",
+      color: "#1f2937",
+    },
+    hero: {
+      background: "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,255,240,0.9))",
+      border: "1px solid rgba(0,0,0,0.1)",
+    },
+    card: {
+      background: "rgba(255, 255, 255, 0.85)",
+      border: "1px solid rgba(0,0,0,0.08)",
+    },
+    input: {
+      background: "#ffffff",
+      color: "#1f2937",
+    },
+    text: "#1f2937",
+    textSecondary: "#4b5563",
+    border: "rgba(0,0,0,0.1)",
+    badgeBg: "rgba(0,0,0,0.05)",
+    filterBg: "rgba(255, 255, 255, 0.7)",
   },
 };
+
+function getStyles(theme) {
+  const isDark = theme === 'dark';
+  
+  return {
+    page: {
+      minHeight: "100vh",
+      fontFamily:
+        'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"',
+      background: isDark ? themes.dark.page.background : themes.light.page.background,
+      color: isDark ? themes.dark.text : themes.light.text,
+      padding: 20,
+      transition: "all 0.3s ease",
+    },
+
+    shell: {
+      maxWidth: 1280,
+      margin: "0 auto",
+    },
+
+    hero: {
+      position: "relative",
+      overflow: "hidden",
+      borderRadius: 30,
+      padding: "28px 28px 34px",
+      marginBottom: 24,
+      background: isDark ? themes.dark.hero.background : themes.light.hero.background,
+      border: isDark ? themes.dark.hero.border : themes.light.hero.border,
+      boxShadow: isDark ? "0 24px 70px rgba(0,0,0,0.28)" : "0 24px 50px rgba(0,0,0,0.1)",
+      backdropFilter: "blur(14px)",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      textAlign: "center",
+    },
+
+    heroGlow: {
+      position: "absolute",
+      right: -80,
+      top: -80,
+      width: 280,
+      height: 280,
+      borderRadius: "50%",
+      background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,100,0,0.05)",
+      filter: "blur(24px)",
+      pointerEvents: "none",
+    },
+
+    heroTitle: {
+      margin: 0,
+      fontSize: "clamp(44px, 10vw, 118px)",
+      lineHeight: 0.88,
+      fontWeight: 900,
+      letterSpacing: "-0.06em",
+      textTransform: "uppercase",
+      color: isDark ? "rgba(255,255,255,0.92)" : "#0f3d1e",
+      position: "relative",
+      zIndex: 1,
+    },
+
+    heroMetaRow: {
+      marginTop: 18,
+      display: "flex",
+      gap: 10,
+      flexWrap: "wrap",
+      alignItems: "center",
+      justifyContent: "center",
+      position: "relative",
+      zIndex: 1,
+    },
+
+    statsPill: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 8,
+      padding: "8px 14px",
+      borderRadius: 999,
+      background: isDark ? "rgba(7, 28, 14, 0.26)" : "rgba(255, 255, 255, 0.8)",
+      border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.08)",
+      color: isDark ? "#fff" : "#1f2937",
+      fontSize: 12,
+      fontWeight: 700,
+      letterSpacing: "0.04em",
+      textTransform: "uppercase",
+      backdropFilter: "blur(8px)",
+    },
+
+    statsPillButton: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 8,
+      padding: "8px 14px",
+      borderRadius: 999,
+      background: isDark ? "rgba(7, 28, 14, 0.26)" : "rgba(255, 255, 255, 0.8)",
+      border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.08)",
+      color: isDark ? "#fff" : "#1f2937",
+      fontSize: 12,
+      fontWeight: 700,
+      letterSpacing: "0.04em",
+      textTransform: "uppercase",
+      backdropFilter: "blur(8px)",
+      cursor: "pointer",
+    },
+
+    breadcrumbContainer: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 20,
+      padding: "8px 0",
+      flexWrap: "wrap",
+    },
+
+    breadcrumbItem: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      fontSize: 13,
+      color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.6)",
+      cursor: "pointer",
+      transition: "color 0.2s",
+    },
+
+    breadcrumbActive: {
+      color: isDark ? "#fff" : "#0f3d1e",
+      fontWeight: 600,
+    },
+
+    breadcrumbSeparator: {
+      color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.3)",
+      fontSize: 12,
+    },
+
+    filterContainer: {
+      marginBottom: 20,
+      padding: "12px 16px",
+      background: isDark ? "rgba(8, 30, 15, 0.24)" : "rgba(255, 255, 255, 0.7)",
+      backdropFilter: "blur(14px)",
+      borderRadius: 20,
+      border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.08)",
+    },
+
+    filterTitle: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 12,
+      color: isDark ? "rgba(255,255,255,0.9)" : "#1f2937",
+    },
+
+    filterChips: {
+      display: "flex",
+      gap: 10,
+      flexWrap: "wrap",
+    },
+
+    filterChip: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 6,
+      padding: "6px 14px",
+      borderRadius: 999,
+      background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)",
+      border: isDark ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(0,0,0,0.1)",
+      color: isDark ? "rgba(255,255,255,0.85)" : "#374151",
+      fontSize: 12,
+      fontWeight: 500,
+      cursor: "pointer",
+      transition: "all 0.2s",
+    },
+
+    filterChipActive: {
+      background: "linear-gradient(135deg, #dff7cf 0%, #8fcd67 100%)",
+      color: "#12361c",
+      borderColor: "rgba(255,255,255,0.3)",
+    },
+
+    filterChipClear: {
+      background: isDark ? "rgba(220,38,38,0.2)" : "rgba(220,38,38,0.1)",
+      borderColor: isDark ? "rgba(252,165,165,0.3)" : "rgba(220,38,38,0.3)",
+      color: isDark ? "#fff1f2" : "#991b1b",
+    },
+
+    header: {
+      display: "flex",
+      gap: 12,
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      flexWrap: "wrap",
+      marginBottom: 24,
+    },
+
+    h1: {
+      margin: 0,
+      fontSize: 28,
+      color: isDark ? "#ffffff" : "#0f3d1e",
+      letterSpacing: "-0.03em",
+    },
+
+    subtle: {
+      color: isDark ? "rgba(255,255,255,0.78)" : "#4b5563",
+      fontSize: 13,
+      marginTop: 6,
+    },
+
+    headerLeft: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 6,
+    },
+
+    headerTopRow: {
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      flexWrap: "wrap",
+    },
+
+    badge: {
+      display: "inline-block",
+      padding: "6px 12px",
+      borderRadius: 999,
+      fontSize: 12,
+      border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.08)",
+      background: isDark ? "rgba(7, 28, 14, 0.22)" : "rgba(0,0,0,0.05)",
+      color: isDark ? "#fff" : "#1f2937",
+      userSelect: "none",
+      backdropFilter: "blur(8px)",
+    },
+
+    badgeOk: {
+      border: isDark ? "1px solid rgba(134,239,172,0.40)" : "1px solid #10b981",
+      background: isDark ? "rgba(22,163,74,0.20)" : "rgba(16,185,129,0.1)",
+      color: isDark ? "#f0fdf4" : "#065f46",
+    },
+
+    badgeErr: {
+      border: isDark ? "1px solid rgba(252,165,165,0.45)" : "1px solid #ef4444",
+      background: isDark ? "rgba(220,38,38,0.20)" : "rgba(239,68,68,0.1)",
+      color: isDark ? "#fff1f2" : "#991b1b",
+    },
+
+    badgeChecking: {
+      border: isDark ? "1px solid rgba(125,211,252,0.40)" : "1px solid #3b82f6",
+      background: isDark ? "rgba(2,132,199,0.20)" : "rgba(59,130,246,0.1)",
+      color: isDark ? "#f0f9ff" : "#1e40af",
+    },
+
+    grid: {
+      display: "grid",
+      gridTemplateColumns: "repeat(2, 1fr)",
+      gap: 20,
+      alignItems: "start",
+      marginBottom: 24,
+    },
+
+    card: {
+      border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.08)",
+      borderRadius: 24,
+      padding: 20,
+      boxShadow: isDark ? "0 20px 50px rgba(0,0,0,0.20)" : "0 10px 30px rgba(0,0,0,0.05)",
+      background: isDark ? "rgba(8, 30, 15, 0.24)" : "rgba(255, 255, 255, 0.85)",
+      backdropFilter: "blur(14px)",
+      color: isDark ? "#fff" : "#1f2937",
+      height: "100%",
+    },
+
+    cardFull: {
+      gridColumn: "1 / -1",
+      marginBottom: 0,
+    },
+
+    cardTitle: {
+      margin: "0 0 16px 0",
+      fontSize: 18,
+      fontWeight: 800,
+      color: isDark ? "#fff" : "#0f3d1e",
+      letterSpacing: "-0.02em",
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+    },
+
+    row: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+      gap: 12,
+    },
+
+    field: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 8,
+      marginBottom: 12,
+      position: "relative",
+    },
+
+    label: {
+      fontSize: 12,
+      color: isDark ? "rgba(255,255,255,0.82)" : "#4b5563",
+      textTransform: "uppercase",
+      letterSpacing: "0.08em",
+    },
+
+    input: {
+      padding: "12px 14px",
+      borderRadius: 16,
+      border: isDark ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(0,0,0,0.15)",
+      outline: "none",
+      background: isDark ? "rgba(255,255,255,0.94)" : "#ffffff",
+      color: isDark ? "#0f172a" : "#1f2937",
+      fontSize: 14,
+    },
+
+    select: {
+      padding: "12px 14px",
+      borderRadius: 16,
+      border: isDark ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(0,0,0,0.15)",
+      outline: "none",
+      background: isDark ? "rgba(255,255,255,0.94)" : "#ffffff",
+      color: isDark ? "#0f172a" : "#1f2937",
+      fontSize: 14,
+    },
+
+    autocompleteSuggestions: {
+      position: "absolute",
+      top: "100%",
+      left: 0,
+      right: 0,
+      background: isDark ? "rgba(8, 30, 15, 0.95)" : "rgba(255, 255, 255, 0.95)",
+      backdropFilter: "blur(14px)",
+      border: isDark ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(0,0,0,0.1)",
+      borderRadius: 12,
+      marginTop: 4,
+      maxHeight: 200,
+      overflowY: "auto",
+      zIndex: 10,
+    },
+
+    suggestionItem: {
+      padding: "10px 14px",
+      cursor: "pointer",
+      fontSize: 13,
+      color: isDark ? "#fff" : "#1f2937",
+      borderBottom: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.05)",
+      transition: "background 0.2s",
+    },
+
+    buttonRow: {
+      display: "flex",
+      gap: 10,
+      flexWrap: "wrap",
+      marginTop: 8,
+    },
+
+    btn: {
+      padding: "11px 18px",
+      borderRadius: 999,
+      border: isDark ? "1px solid rgba(255,255,255,0.16)" : "1px solid rgba(0,0,0,0.1)",
+      background: isDark ? "rgba(7, 28, 14, 0.28)" : "rgba(0,0,0,0.05)",
+      color: isDark ? "#fff" : "#1f2937",
+      cursor: "pointer",
+      fontWeight: 800,
+      letterSpacing: "0.04em",
+      textTransform: "uppercase",
+      transition: "all 0.2s ease",
+      backdropFilter: "blur(10px)",
+    },
+
+    btnPrimary: {
+      padding: "11px 18px",
+      borderRadius: 999,
+      border: isDark ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(0,0,0,0.1)",
+      background: "linear-gradient(180deg, #dff7cf 0%, #8fcd67 100%)",
+      color: "#12361c",
+      cursor: "pointer",
+      fontWeight: 900,
+      letterSpacing: "0.04em",
+      textTransform: "uppercase",
+      boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
+    },
+
+    btnDanger: {
+      padding: "11px 18px",
+      borderRadius: 999,
+      border: isDark ? "1px solid rgba(254,202,202,0.34)" : "1px solid rgba(220,38,38,0.3)",
+      background: "linear-gradient(180deg, #dc2626 0%, #991b1b 100%)",
+      color: "#fff",
+      cursor: "pointer",
+      fontWeight: 900,
+      letterSpacing: "0.04em",
+      textTransform: "uppercase",
+      boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
+    },
+
+    btnWarning: {
+      padding: "11px 18px",
+      borderRadius: 999,
+      border: isDark ? "1px solid rgba(253,224,71,0.34)" : "1px solid rgba(245,158,11,0.3)",
+      background: "linear-gradient(180deg, #f59e0b 0%, #b45309 100%)",
+      color: "#fff",
+      cursor: "pointer",
+      fontWeight: 900,
+      letterSpacing: "0.04em",
+      textTransform: "uppercase",
+      boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
+    },
+
+    btnSuccess: {
+      padding: "11px 18px",
+      borderRadius: 999,
+      border: isDark ? "1px solid rgba(110,231,183,0.34)" : "1px solid rgba(16,185,129,0.3)",
+      background: "linear-gradient(180deg, #10b981 0%, #059669 100%)",
+      color: "#fff",
+      cursor: "pointer",
+      fontWeight: 900,
+      letterSpacing: "0.04em",
+      textTransform: "uppercase",
+      boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
+    },
+
+    tableWrap: {
+      overflowX: "auto",
+      borderRadius: 18,
+      background: isDark ? "rgba(6, 22, 11, 0.20)" : "rgba(255,255,255,0.5)",
+      border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.05)",
+      marginTop: 8,
+    },
+
+    table: {
+      width: "100%",
+      borderCollapse: "collapse",
+    },
+
+    th: {
+      textAlign: "left",
+      fontSize: 12,
+      color: isDark ? "rgba(255,255,255,0.76)" : "#4b5563",
+      borderBottom: isDark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(0,0,0,0.08)",
+      padding: "12px 10px",
+      whiteSpace: "nowrap",
+      textTransform: "uppercase",
+      letterSpacing: "0.06em",
+    },
+
+    td: {
+      borderBottom: isDark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.05)",
+      padding: "12px 10px",
+      fontSize: 13,
+      color: isDark ? "#fff" : "#1f2937",
+      verticalAlign: "middle",
+    },
+
+    badgeLow: {
+      display: "inline-block",
+      padding: "4px 10px",
+      borderRadius: 999,
+      fontSize: 12,
+      border: isDark ? "1px solid rgba(254,202,202,0.42)" : "1px solid rgba(220,38,38,0.3)",
+      background: isDark ? "rgba(127,29,29,0.28)" : "rgba(239,68,68,0.1)",
+      color: isDark ? "#fff1f2" : "#991b1b",
+    },
+
+    error: {
+      background: isDark ? "rgba(127,29,29,0.35)" : "rgba(239,68,68,0.1)",
+      border: isDark ? "1px solid rgba(252,165,165,0.30)" : "1px solid rgba(239,68,68,0.3)",
+      padding: 12,
+      borderRadius: 16,
+      color: isDark ? "#fff1f2" : "#991b1b",
+      marginBottom: 20,
+      fontSize: 13,
+      backdropFilter: "blur(8px)",
+    },
+
+    ok: {
+      background: isDark ? "rgba(6,95,70,0.30)" : "rgba(16,185,129,0.1)",
+      border: isDark ? "1px solid rgba(110,231,183,0.28)" : "1px solid rgba(16,185,129,0.3)",
+      padding: 12,
+      borderRadius: 16,
+      color: isDark ? "#ecfdf5" : "#065f46",
+      marginBottom: 20,
+      fontSize: 13,
+      backdropFilter: "blur(8px)",
+    },
+
+    footer: {
+      marginTop: 16,
+      color: isDark ? "rgba(255,255,255,0.74)" : "#6b7280",
+      fontSize: 12,
+    },
+
+    helperText: {
+      color: isDark ? "rgba(255,255,255,0.76)" : "#6b7280",
+      fontSize: 13,
+      marginTop: 12,
+      lineHeight: 1.6,
+    },
+
+    scrollTopButton: {
+      position: "fixed",
+      right: 20,
+      bottom: 20,
+      width: 52,
+      height: 52,
+      borderRadius: "50%",
+      border: "1px solid rgba(255,255,255,0.18)",
+      background: "linear-gradient(180deg, #dff7cf 0%, #8fcd67 100%)",
+      color: "#12361c",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
+      zIndex: 999,
+    },
+
+    bulkActionsBar: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      padding: "12px 16px",
+      background: isDark ? "rgba(8, 30, 15, 0.8)" : "rgba(255, 255, 255, 0.9)",
+      backdropFilter: "blur(14px)",
+      borderRadius: 16,
+      marginBottom: 16,
+      flexWrap: "wrap",
+    },
+
+    checkbox: {
+      width: 18,
+      height: 18,
+      cursor: "pointer",
+      accentColor: "#8fcd67",
+    },
+  };
+}
 
 export default function App() {
   const [items, setItems] = useState([]);
   const [deletedItems, setDeletedItems] = useState([]);
   const [txns, setTxns] = useState([]);
+  const [selectedItems, setSelectedItems] = useState(new Set());
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme || 'dark';
+  });
 
   const [message, setMessage] = useState(null);
   const msgTimerRef = useRef(null);
   const txnSectionRef = useRef(null);
   const itemsSectionRef = useRef(null);
   const binSectionRef = useRef(null);
+  const addSupplySectionRef = useRef(null);
 
   const [newName, setNewName] = useState("");
   const [newUnit, setNewUnit] = useState("ream");
   const [customUnit, setCustomUnit] = useState("");
   const [newQty, setNewQty] = useState("0");
   const [newMin, setNewMin] = useState("0");
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const [selectedItemId, setSelectedItemId] = useState("");
   const [txnType, setTxnType] = useState("OUT");
@@ -503,11 +728,40 @@ export default function App() {
 
   const [authLoading, setAuthLoading] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [currentSection, setCurrentSection] = useState("items");
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [importing, setImporting] = useState(false);
+  const [selectAll, setSelectAll] = useState(false);
 
   const isAdmin =
     role === "admin" ||
     (profile?.email || session?.user?.email) === "adminrpbdd@gmail.com";
   const isGuest = role === "guest";
+
+  // Toggle theme function
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+  };
+
+  // Get styles based on current theme
+  const styles = getStyles(theme);
+
+  // Get unique item names for autocomplete
+  const itemNames = useMemo(() => {
+    const names = items.map(item => item.name.toLowerCase());
+    return [...new Set(names)];
+  }, [items]);
+
+  // Filter suggestions based on input
+  const suggestions = useMemo(() => {
+    if (!newName.trim()) return [];
+    const inputLower = newName.toLowerCase();
+    return itemNames
+      .filter(name => name.includes(inputLower) && name !== inputLower)
+      .slice(0, 5);
+  }, [newName, itemNames]);
 
   function showMessage(type, text) {
     setMessage({ type, text });
@@ -518,17 +772,21 @@ export default function App() {
   function handleSelectItem(itemId) {
     if (!isAdmin) return;
     setSelectedItemId(itemId);
+    setCurrentSection("transactions");
     txnSectionRef.current?.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });
   }
 
-  function scrollToSection(ref) {
-    ref.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+  function scrollToSection(ref, sectionName) {
+    setCurrentSection(sectionName);
+    if (ref.current) {
+      ref.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
   }
 
   function scrollToTop() {
@@ -537,6 +795,339 @@ export default function App() {
       behavior: "smooth",
     });
   }
+
+  // Row selection handlers
+  function toggleItemSelection(itemId) {
+    const newSelection = new Set(selectedItems);
+    if (newSelection.has(itemId)) {
+      newSelection.delete(itemId);
+    } else {
+      newSelection.add(itemId);
+    }
+    setSelectedItems(newSelection);
+    setSelectAll(newSelection.size === filteredItems.length && filteredItems.length > 0);
+  }
+
+  function toggleSelectAll() {
+    if (selectAll) {
+      setSelectedItems(new Set());
+      setSelectAll(false);
+    } else {
+      const allIds = filteredItems.map(item => item.id);
+      setSelectedItems(new Set(allIds));
+      setSelectAll(true);
+    }
+  }
+
+  // Bulk actions
+  async function bulkRecycle() {
+    if (selectedItems.size === 0) {
+      showMessage("error", "No items selected");
+      return;
+    }
+
+    const confirm = window.confirm(`Move ${selectedItems.size} selected item(s) to Recycle Bin?`);
+    if (!confirm) return;
+
+    const deletedAt = new Date().toISOString();
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const itemId of selectedItems) {
+      const { error: itemErr } = await supabase
+        .from("items")
+        .update({ deleted_at: deletedAt })
+        .eq("id", itemId);
+
+      if (itemErr) {
+        errorCount++;
+        console.error(`Failed to recycle item ${itemId}:`, itemErr);
+      } else {
+        successCount++;
+        
+        const { error: txnErr } = await supabase
+          .from("txns")
+          .update({ deleted_at: deletedAt })
+          .eq("item_id", itemId);
+
+        if (txnErr) console.error(`Failed to recycle transactions for item ${itemId}:`, txnErr);
+      }
+    }
+
+    await refreshData();
+    setSelectedItems(new Set());
+    setSelectAll(false);
+    showMessage("ok", `Recycled ${successCount} items. Failed: ${errorCount}`);
+  }
+
+  async function bulkUpdateMinLevel() {
+    if (selectedItems.size === 0) {
+      showMessage("error", "No items selected");
+      return;
+    }
+
+    const newMinLevel = prompt("Enter new minimum stock level for selected items:", "10");
+    if (newMinLevel === null) return;
+    
+    const minLevelNum = parseInt(newMinLevel);
+    if (isNaN(minLevelNum) || minLevelNum < 0) {
+      showMessage("error", "Please enter a valid number");
+      return;
+    }
+
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const itemId of selectedItems) {
+      const { error } = await supabase
+        .from("items")
+        .update({ min_level: minLevelNum })
+        .eq("id", itemId);
+
+      if (error) {
+        errorCount++;
+        console.error(`Failed to update item ${itemId}:`, error);
+      } else {
+        successCount++;
+      }
+    }
+
+    await refreshData();
+    setSelectedItems(new Set());
+    setSelectAll(false);
+    showMessage("ok", `Updated ${successCount} items. Failed: ${errorCount}`);
+  }
+
+  // Export functions
+  function exportToExcel() {
+    const exportData = filteredItems.map(item => ({
+      "Item Name": item.name,
+      "Quantity": item.quantity,
+      "Unit": item.unit,
+      "Minimum Level": item.min_level,
+      "Status": Number(item.quantity) <= Number(item.min_level) && Number(item.min_level) > 0 ? "Low Stock" : "OK",
+      "Last Updated": formatDate(item.updated_at)
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Inventory");
+    XLSX.writeFile(wb, `inventory_${new Date().toISOString().split('T')[0]}.xlsx`);
+    showMessage("ok", "Excel file exported successfully!");
+  }
+
+  function exportToPDF() {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.setTextColor(0, 100, 0);
+    doc.text("RPBDD Supplies Inventory Report", 14, 20);
+    
+    // Add date
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+    
+    // Add summary
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Total Items: ${filteredItems.length}`, 14, 40);
+    doc.text(`Low Stock Items: ${filteredItems.filter(i => Number(i.quantity) <= Number(i.min_level) && Number(i.min_level) > 0).length}`, 14, 47);
+    
+    // Prepare table data
+    const tableData = filteredItems.map(item => [
+      item.name,
+      item.quantity.toString(),
+      item.unit,
+      item.min_level.toString(),
+      Number(item.quantity) <= Number(item.min_level) && Number(item.min_level) > 0 ? "LOW" : "OK"
+    ]);
+    
+    // Add table
+    doc.autoTable({
+      head: [["Item Name", "Quantity", "Unit", "Min Level", "Status"]],
+      body: tableData,
+      startY: 55,
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [76, 175, 80], textColor: [255, 255, 255] },
+      alternateRowStyles: { fillColor: [240, 240, 240] },
+    });
+    
+    doc.save(`inventory_report_${new Date().toISOString().split('T')[0]}.pdf`);
+    showMessage("ok", "PDF report exported successfully!");
+  }
+
+  // Export to CSV
+  function exportToCSV() {
+    try {
+      const csvData = filteredItems.map(item => ({
+        Name: item.name,
+        Quantity: item.quantity,
+        Unit: item.unit,
+        "Min Level": item.min_level,
+        Status: Number(item.quantity) <= Number(item.min_level) && Number(item.min_level) > 0 ? "Low Stock" : "OK",
+        "Last Updated": formatDate(item.updated_at)
+      }));
+
+      const headers = Object.keys(csvData[0] || {});
+      const csvRows = [
+        headers.join(','),
+        ...csvData.map(row => 
+          headers.map(header => 
+            JSON.stringify(row[header] || '', (key, value) => 
+              value === null ? '' : value
+            )
+          ).join(',')
+        )
+      ];
+
+      const csvString = csvRows.join('\n');
+      const blob = new Blob([csvString], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `inventory_export_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showMessage("ok", "CSV file exported successfully!");
+    } catch (error) {
+      console.error("Export error:", error);
+      showMessage("error", "Failed to export inventory");
+    }
+  }
+
+  // Import from CSV
+  async function importFromCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setImporting(true);
+    const reader = new FileReader();
+
+    reader.onload = async (e) => {
+      try {
+        const text = e.target.result;
+        const rows = text.split('\n').filter(row => row.trim());
+        const headers = rows[0].split(',').map(h => h.replace(/["']/g, '').trim());
+        
+        const itemsToImport = [];
+        
+        for (let i = 1; i < rows.length; i++) {
+          const values = rows[i].split(',').map(v => v.replace(/["']/g, '').trim());
+          const item = {};
+          
+          headers.forEach((header, index) => {
+            if (header === 'Name') item.name = values[index];
+            if (header === 'Quantity') item.quantity = parseFloat(values[index]) || 0;
+            if (header === 'Unit') item.unit = values[index] || 'pcs';
+            if (header === 'Min Level') item.min_level = parseFloat(values[index]) || 0;
+          });
+          
+          if (item.name) {
+            itemsToImport.push(item);
+          }
+        }
+
+        if (itemsToImport.length === 0) {
+          throw new Error("No valid items found in CSV");
+        }
+
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (const item of itemsToImport) {
+          const { data: inserted, error } = await supabase
+            .from("items")
+            .insert({
+              name: normalizeName(item.name),
+              unit: item.unit,
+              quantity: clampNonNegative(item.quantity),
+              min_level: clampNonNegative(item.min_level),
+              deleted_at: null,
+            })
+            .select()
+            .single();
+
+          if (error) {
+            errorCount++;
+            console.error(`Failed to import ${item.name}:`, error);
+          } else {
+            successCount++;
+            
+            if (item.quantity > 0 && inserted) {
+              await supabase.from("txns").insert({
+                type: "IN",
+                item_id: inserted.id,
+                qty: item.quantity,
+                note: "Bulk import",
+                deleted_at: null,
+              });
+            }
+          }
+        }
+
+        await refreshData();
+        showMessage("ok", `Imported ${successCount} items successfully. Failed: ${errorCount}`);
+        
+      } catch (error) {
+        console.error("Import error:", error);
+        showMessage("error", `Import failed: ${error.message}`);
+      } finally {
+        setImporting(false);
+        event.target.value = '';
+      }
+    };
+
+    reader.onerror = () => {
+      showMessage("error", "Failed to read file");
+      setImporting(false);
+    };
+
+    reader.readAsText(file);
+  }
+
+  // Apply filters to items
+  const getFilteredItems = () => {
+    let filtered = [...items];
+    
+    const q = search.trim().toLowerCase();
+    if (q) {
+      filtered = filtered.filter((it) => it.name.toLowerCase().includes(q));
+    }
+    
+    switch (activeFilter) {
+      case "low-stock":
+        filtered = filtered.filter(
+          (it) => Number(it.quantity) <= Number(it.min_level) && Number(it.min_level) > 0
+        );
+        break;
+      case "in-stock":
+        filtered = filtered.filter(
+          (it) => Number(it.quantity) > Number(it.min_level)
+        );
+        break;
+      case "critical":
+        filtered = filtered.filter(
+          (it) => Number(it.quantity) === 0
+        );
+        break;
+      case "recent":
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        filtered = filtered.filter(
+          (it) => new Date(it.updated_at) >= sevenDaysAgo
+        );
+        break;
+      default:
+        break;
+    }
+    
+    return filtered;
+  };
 
   useEffect(() => {
     async function loadSession() {
@@ -803,6 +1394,7 @@ export default function App() {
     setNewMin("0");
     setNewUnit("ream");
     setCustomUnit("");
+    setShowSuggestions(false);
 
     await refreshData(inserted.id);
     showMessage("ok", `Added "${name}".`);
@@ -948,11 +1540,7 @@ export default function App() {
 
   const itemMap = useMemo(() => new Map(items.map((it) => [it.id, it])), [items]);
 
-  const filteredItems = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return items;
-    return items.filter((it) => it.name.toLowerCase().includes(q));
-  }, [items, search]);
+  const filteredItems = useMemo(() => getFilteredItems(), [items, search, activeFilter]);
 
   const filteredDeletedItems = useMemo(() => {
     const q = binSearch.trim().toLowerCase();
@@ -1003,6 +1591,151 @@ export default function App() {
       : connStatus === "error"
         ? "DB: ERROR"
         : "DB: CHECKING";
+
+  // Breadcrumb navigation component
+  const BreadcrumbNavigation = () => (
+    <div style={styles.breadcrumbContainer}>
+      <div
+        style={{
+          ...styles.breadcrumbItem,
+          ...(currentSection === "home" ? styles.breadcrumbActive : {}),
+        }}
+        onClick={() => {
+          setCurrentSection("home");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      >
+        <Home size={14} />
+        <span>Home</span>
+      </div>
+      <span style={styles.breadcrumbSeparator}>/</span>
+      <div
+        style={{
+          ...styles.breadcrumbItem,
+          ...(currentSection === "items" ? styles.breadcrumbActive : {}),
+        }}
+        onClick={() => scrollToSection(itemsSectionRef, "items")}
+      >
+        <Package2 size={14} />
+        <span>Items</span>
+      </div>
+      {isAdmin && (
+        <>
+          <span style={styles.breadcrumbSeparator}>/</span>
+          <div
+            style={{
+              ...styles.breadcrumbItem,
+              ...(currentSection === "add-supply" ? styles.breadcrumbActive : {}),
+            }}
+            onClick={() => scrollToSection(addSupplySectionRef, "add-supply")}
+          >
+            <Plus size={14} />
+            <span>Add Supply</span>
+          </div>
+        </>
+      )}
+      {isAdmin && (
+        <>
+          <span style={styles.breadcrumbSeparator}>/</span>
+          <div
+            style={{
+              ...styles.breadcrumbItem,
+              ...(currentSection === "transactions" ? styles.breadcrumbActive : {}),
+            }}
+            onClick={() => scrollToSection(txnSectionRef, "transactions")}
+          >
+            <ArrowDownUp size={14} />
+            <span>Transactions</span>
+          </div>
+        </>
+      )}
+      {isAdmin && deletedItems.length > 0 && (
+        <>
+          <span style={styles.breadcrumbSeparator}>/</span>
+          <div
+            style={{
+              ...styles.breadcrumbItem,
+              ...(currentSection === "recycle-bin" ? styles.breadcrumbActive : {}),
+            }}
+            onClick={() => scrollToSection(binSectionRef, "recycle-bin")}
+          >
+            <Archive size={14} />
+            <span>Recycle Bin</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+
+  // Quick filters component
+  const QuickFilters = () => (
+    <div style={styles.filterContainer}>
+      <div style={styles.filterTitle}>
+        <Filter size={14} />
+        <span>Quick Filters</span>
+      </div>
+      <div style={styles.filterChips}>
+        <button
+          style={{
+            ...styles.filterChip,
+            ...(activeFilter === "all" ? styles.filterChipActive : {}),
+          }}
+          onClick={() => setActiveFilter("all")}
+        >
+          All Items
+        </button>
+        <button
+          style={{
+            ...styles.filterChip,
+            ...(activeFilter === "low-stock" ? styles.filterChipActive : {}),
+          }}
+          onClick={() => setActiveFilter("low-stock")}
+        >
+          <AlertTriangle size={12} />
+          Low Stock ({lowCount})
+        </button>
+        <button
+          style={{
+            ...styles.filterChip,
+            ...(activeFilter === "in-stock" ? styles.filterChipActive : {}),
+          }}
+          onClick={() => setActiveFilter("in-stock")}
+        >
+          <Package2 size={12} />
+          In Stock
+        </button>
+        <button
+          style={{
+            ...styles.filterChip,
+            ...(activeFilter === "critical" ? styles.filterChipActive : {}),
+          }}
+          onClick={() => setActiveFilter("critical")}
+        >
+          <AlertTriangle size={12} />
+          Critical (0)
+        </button>
+        <button
+          style={{
+            ...styles.filterChip,
+            ...(activeFilter === "recent" ? styles.filterChipActive : {}),
+          }}
+          onClick={() => setActiveFilter("recent")}
+        >
+          <Clock size={12} />
+          Recently Updated
+        </button>
+        {activeFilter !== "all" && (
+          <button
+            style={{ ...styles.filterChip, ...styles.filterChipClear }}
+            onClick={() => setActiveFilter("all")}
+          >
+            <X size={12} />
+            Clear Filter
+          </button>
+        )}
+      </div>
+    </div>
+  );
 
   if (authLoading) {
     return (
@@ -1091,6 +1824,12 @@ export default function App() {
     );
   }
 
+  const isMobile = window.innerWidth <= 768;
+  const gridStyle = {
+    ...styles.grid,
+    gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
+  };
+
   return (
     <div style={styles.page}>
       <div style={styles.shell}>
@@ -1113,7 +1852,7 @@ export default function App() {
             <button
               type="button"
               style={styles.statsPillButton}
-              onClick={() => scrollToSection(itemsSectionRef)}
+              onClick={() => scrollToSection(itemsSectionRef, "items")}
               title="Go to Items section"
             >
               <Package2 size={14} />
@@ -1129,7 +1868,7 @@ export default function App() {
               <button
                 type="button"
                 style={styles.statsPillButton}
-                onClick={() => scrollToSection(binSectionRef)}
+                onClick={() => scrollToSection(binSectionRef, "recycle-bin")}
                 title="Go to Recycle Bin section"
               >
                 <Archive size={14} />
@@ -1138,6 +1877,8 @@ export default function App() {
             )}
           </div>
         </motion.div>
+
+        <BreadcrumbNavigation />
 
         <div style={styles.header}>
           <div style={styles.headerLeft}>
@@ -1157,6 +1898,58 @@ export default function App() {
           </div>
 
           <div style={styles.buttonRow}>
+            {/* Theme Switcher Button */}
+            <FancyButton
+              style={styles.btn}
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              icon={theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            >
+              {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            </FancyButton>
+
+            {isAdmin && (
+              <>
+                <FancyButton
+                  style={styles.btnSuccess}
+                  onClick={exportToExcel}
+                  title="Export to Excel"
+                  icon={<FileSpreadsheet size={16} />}
+                >
+                  Excel
+                </FancyButton>
+
+
+                <FancyButton
+                  style={styles.btnPrimary}
+                  onClick={exportToCSV}
+                  title="Export to CSV"
+                  icon={<Download size={16} />}
+                >
+                  CSV
+                </FancyButton>
+                
+                <label htmlFor="csv-import" style={{ margin: 0 }}>
+                  <input
+                    id="csv-import"
+                    type="file"
+                    accept=".csv"
+                    onChange={importFromCSV}
+                    style={{ display: "none" }}
+                    disabled={importing}
+                  />
+                  <FancyButton
+                    style={styles.btnPrimary}
+                    onClick={() => document.getElementById('csv-import').click()}
+                    title="Import inventory from CSV"
+                    icon={<Upload size={16} />}
+                  >
+                    {importing ? "Importing..." : "Import"}
+                  </FancyButton>
+                </label>
+              </>
+            )}
+
             {isAdmin && (
               <FancyButton
                 style={styles.btnWarning}
@@ -1181,9 +1974,10 @@ export default function App() {
         {message?.type === "error" && <div style={styles.error}>{message.text}</div>}
         {message?.type === "ok" && <div style={styles.ok}>{message.text}</div>}
 
-        <div style={styles.grid}>
+        <div style={gridStyle}>
           {isAdmin && (
             <motion.div
+              ref={addSupplySectionRef}
               style={styles.card}
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1200,9 +1994,32 @@ export default function App() {
                   <input
                     style={styles.input}
                     value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    placeholder="Bond Paper"
+                    onChange={(e) => {
+                      setNewName(e.target.value);
+                      setShowSuggestions(true);
+                    }}
+                    onFocus={() => setShowSuggestions(true)}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    placeholder="Enter item name..."
                   />
+                  {showSuggestions && suggestions.length > 0 && (
+                    <div style={styles.autocompleteSuggestions}>
+                      {suggestions.map((suggestion, index) => (
+                        <div
+                          key={index}
+                          style={styles.suggestionItem}
+                          onClick={() => {
+                            setNewName(suggestion);
+                            setShowSuggestions(false);
+                          }}
+                          onMouseEnter={(e) => e.target.style.background = theme === 'dark' ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"}
+                          onMouseLeave={(e) => e.target.style.background = "transparent"}
+                        >
+                          {suggestion}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div style={styles.row}>
@@ -1366,7 +2183,50 @@ export default function App() {
             <h2 style={styles.cardTitle}>
               <Package2 size={18} />
               Items
+              {activeFilter !== "all" && (
+                <span style={styles.badge}>
+                  Filtered: {filteredItems.length} items
+                </span>
+              )}
+              {selectedItems.size > 0 && (
+                <span style={styles.badge}>
+                  {selectedItems.size} selected
+                </span>
+              )}
             </h2>
+
+            <QuickFilters />
+
+            {isAdmin && selectedItems.size > 0 && (
+              <div style={styles.bulkActionsBar}>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>
+                  {selectedItems.size} item(s) selected
+                </span>
+                <FancyButton
+                  style={styles.btnWarning}
+                  onClick={bulkRecycle}
+                  icon={<Archive size={14} />}
+                >
+                  Recycle Selected
+                </FancyButton>
+                <FancyButton
+                  style={styles.btnPrimary}
+                  onClick={bulkUpdateMinLevel}
+                  icon={<RefreshCw size={14} />}
+                >
+                  Update Min Level
+                </FancyButton>
+                <FancyButton
+                  style={styles.btn}
+                  onClick={() => {
+                    setSelectedItems(new Set());
+                    setSelectAll(false);
+                  }}
+                >
+                  Clear Selection
+                </FancyButton>
+              </div>
+            )}
 
             <div style={styles.row}>
               <div style={styles.field}>
@@ -1397,18 +2257,28 @@ export default function App() {
               <table style={styles.table}>
                 <thead>
                   <tr>
+                    {isAdmin && (
+                      <th style={{ ...styles.th, width: 40 }}>
+                        <input
+                          type="checkbox"
+                          style={styles.checkbox}
+                          checked={selectAll}
+                          onChange={toggleSelectAll}
+                        />
+                      </th>
+                    )}
                     <th style={styles.th}>Name</th>
                     <th style={styles.th}>Qty</th>
                     <th style={styles.th}>Unit</th>
                     <th style={styles.th}>Low stock</th>
                     <th style={styles.th}>Updated</th>
                     <th style={styles.th}>Actions</th>
-                  </tr>
+                   </tr>
                 </thead>
                 <tbody>
                   {filteredItems.length === 0 ? (
                     <tr>
-                      <td style={styles.td} colSpan={6}>
+                      <td style={styles.td} colSpan={isAdmin ? 7 : 6}>
                         No items found.
                       </td>
                     </tr>
@@ -1420,6 +2290,16 @@ export default function App() {
 
                       return (
                         <tr key={it.id}>
+                          {isAdmin && (
+                            <td style={styles.td}>
+                              <input
+                                type="checkbox"
+                                style={styles.checkbox}
+                                checked={selectedItems.has(it.id)}
+                                onChange={() => toggleItemSelection(it.id)}
+                              />
+                            </td>
+                          )}
                           <td style={styles.td}>{it.name}</td>
                           <td style={styles.td}>
                             <b>{it.quantity}</b>
