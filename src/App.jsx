@@ -733,10 +733,19 @@ export default function App() {
   const [importing, setImporting] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
 
-  const isAdmin =
-    role === "admin" ||
-    (profile?.email || session?.user?.email) === "adminrpbdd@gmail.com";
-  const isGuest = role === "guest";
+const isAdmin =
+  role === "admin" ||
+  (profile?.email || session?.user?.email) === "adminrpbdd@gmail.com";
+const isGuest = role === "guest";
+
+useEffect(() => {
+  console.log({
+    role,
+    profile,
+    sessionEmail: session?.user?.email,
+    isAdmin,
+  });
+}, [role, profile, session, isAdmin]);
 
   // Toggle theme function
   const toggleTheme = () => {
