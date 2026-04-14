@@ -21,18 +21,14 @@ import {
   Upload,
   Download,
   FileSpreadsheet,
-  FileText,
-  CheckSquare,
-  Square,
-  Trash,
   RefreshCw,
   Sun,
   Moon,
 } from "lucide-react";
 import { supabase } from "./lib/supabaseClient";
-import * as XLSX from 'xlsx';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import * as XLSX from "xlsx";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 function toNumber(value) {
   const n = Number(value);
@@ -98,11 +94,13 @@ function FancyButton({ children, style, icon, ...props }) {
 const themes = {
   dark: {
     page: {
-      background: "radial-gradient(circle at top left, rgba(255,255,255,0.10), transparent 22%), linear-gradient(180deg, #0f3d1e 0%, #17612b 38%, #2f8f3a 100%)",
+      background:
+        "radial-gradient(circle at top left, rgba(255,255,255,0.10), transparent 22%), linear-gradient(180deg, #0f3d1e 0%, #17612b 38%, #2f8f3a 100%)",
       color: "#ffffff",
     },
     hero: {
-      background: "linear-gradient(135deg, rgba(7,28,14,0.42), rgba(255,255,255,0.04))",
+      background:
+        "linear-gradient(135deg, rgba(7,28,14,0.42), rgba(255,255,255,0.04))",
       border: "1px solid rgba(255,255,255,0.14)",
     },
     card: {
@@ -125,7 +123,8 @@ const themes = {
       color: "#1f2937",
     },
     hero: {
-      background: "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,255,240,0.9))",
+      background:
+        "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,255,240,0.9))",
       border: "1px solid rgba(0,0,0,0.1)",
     },
     card: {
@@ -145,8 +144,8 @@ const themes = {
 };
 
 function getStyles(theme) {
-  const isDark = theme === 'dark';
-  
+  const isDark = theme === "dark";
+
   return {
     page: {
       minHeight: "100vh",
@@ -171,7 +170,9 @@ function getStyles(theme) {
       marginBottom: 24,
       background: isDark ? themes.dark.hero.background : themes.light.hero.background,
       border: isDark ? themes.dark.hero.border : themes.light.hero.border,
-      boxShadow: isDark ? "0 24px 70px rgba(0,0,0,0.28)" : "0 24px 50px rgba(0,0,0,0.1)",
+      boxShadow: isDark
+        ? "0 24px 70px rgba(0,0,0,0.28)"
+        : "0 24px 50px rgba(0,0,0,0.1)",
       backdropFilter: "blur(14px)",
       display: "flex",
       flexDirection: "column",
@@ -222,7 +223,9 @@ function getStyles(theme) {
       padding: "8px 14px",
       borderRadius: 999,
       background: isDark ? "rgba(7, 28, 14, 0.26)" : "rgba(255, 255, 255, 0.8)",
-      border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.08)",
+      border: isDark
+        ? "1px solid rgba(255,255,255,0.12)"
+        : "1px solid rgba(0,0,0,0.08)",
       color: isDark ? "#fff" : "#1f2937",
       fontSize: 12,
       fontWeight: 700,
@@ -238,7 +241,9 @@ function getStyles(theme) {
       padding: "8px 14px",
       borderRadius: 999,
       background: isDark ? "rgba(7, 28, 14, 0.26)" : "rgba(255, 255, 255, 0.8)",
-      border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.08)",
+      border: isDark
+        ? "1px solid rgba(255,255,255,0.12)"
+        : "1px solid rgba(0,0,0,0.08)",
       color: isDark ? "#fff" : "#1f2937",
       fontSize: 12,
       fontWeight: 700,
@@ -283,7 +288,9 @@ function getStyles(theme) {
       background: isDark ? "rgba(8, 30, 15, 0.24)" : "rgba(255, 255, 255, 0.7)",
       backdropFilter: "blur(14px)",
       borderRadius: 20,
-      border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.08)",
+      border: isDark
+        ? "1px solid rgba(255,255,255,0.12)"
+        : "1px solid rgba(0,0,0,0.08)",
     },
 
     filterTitle: {
@@ -309,7 +316,9 @@ function getStyles(theme) {
       padding: "6px 14px",
       borderRadius: 999,
       background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)",
-      border: isDark ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(0,0,0,0.1)",
+      border: isDark
+        ? "1px solid rgba(255,255,255,0.15)"
+        : "1px solid rgba(0,0,0,0.1)",
       color: isDark ? "rgba(255,255,255,0.85)" : "#374151",
       fontSize: 12,
       fontWeight: 500,
@@ -325,7 +334,9 @@ function getStyles(theme) {
 
     filterChipClear: {
       background: isDark ? "rgba(220,38,38,0.2)" : "rgba(220,38,38,0.1)",
-      borderColor: isDark ? "rgba(252,165,165,0.3)" : "rgba(220,38,38,0.3)",
+      borderColor: isDark
+        ? "rgba(252,165,165,0.3)"
+        : "rgba(220,38,38,0.3)",
       color: isDark ? "#fff1f2" : "#991b1b",
     },
 
@@ -369,7 +380,9 @@ function getStyles(theme) {
       padding: "6px 12px",
       borderRadius: 999,
       fontSize: 12,
-      border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.08)",
+      border: isDark
+        ? "1px solid rgba(255,255,255,0.12)"
+        : "1px solid rgba(0,0,0,0.08)",
       background: isDark ? "rgba(7, 28, 14, 0.22)" : "rgba(0,0,0,0.05)",
       color: isDark ? "#fff" : "#1f2937",
       userSelect: "none",
@@ -377,19 +390,25 @@ function getStyles(theme) {
     },
 
     badgeOk: {
-      border: isDark ? "1px solid rgba(134,239,172,0.40)" : "1px solid #10b981",
+      border: isDark
+        ? "1px solid rgba(134,239,172,0.40)"
+        : "1px solid #10b981",
       background: isDark ? "rgba(22,163,74,0.20)" : "rgba(16,185,129,0.1)",
       color: isDark ? "#f0fdf4" : "#065f46",
     },
 
     badgeErr: {
-      border: isDark ? "1px solid rgba(252,165,165,0.45)" : "1px solid #ef4444",
+      border: isDark
+        ? "1px solid rgba(252,165,165,0.45)"
+        : "1px solid #ef4444",
       background: isDark ? "rgba(220,38,38,0.20)" : "rgba(239,68,68,0.1)",
       color: isDark ? "#fff1f2" : "#991b1b",
     },
 
     badgeChecking: {
-      border: isDark ? "1px solid rgba(125,211,252,0.40)" : "1px solid #3b82f6",
+      border: isDark
+        ? "1px solid rgba(125,211,252,0.40)"
+        : "1px solid #3b82f6",
       background: isDark ? "rgba(2,132,199,0.20)" : "rgba(59,130,246,0.1)",
       color: isDark ? "#f0f9ff" : "#1e40af",
     },
@@ -403,10 +422,14 @@ function getStyles(theme) {
     },
 
     card: {
-      border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(0,0,0,0.08)",
+      border: isDark
+        ? "1px solid rgba(255,255,255,0.12)"
+        : "1px solid rgba(0,0,0,0.08)",
       borderRadius: 24,
       padding: 20,
-      boxShadow: isDark ? "0 20px 50px rgba(0,0,0,0.20)" : "0 10px 30px rgba(0,0,0,0.05)",
+      boxShadow: isDark
+        ? "0 20px 50px rgba(0,0,0,0.20)"
+        : "0 10px 30px rgba(0,0,0,0.05)",
       background: isDark ? "rgba(8, 30, 15, 0.24)" : "rgba(255, 255, 255, 0.85)",
       backdropFilter: "blur(14px)",
       color: isDark ? "#fff" : "#1f2937",
@@ -453,7 +476,9 @@ function getStyles(theme) {
     input: {
       padding: "12px 14px",
       borderRadius: 16,
-      border: isDark ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(0,0,0,0.15)",
+      border: isDark
+        ? "1px solid rgba(255,255,255,0.18)"
+        : "1px solid rgba(0,0,0,0.15)",
       outline: "none",
       background: isDark ? "rgba(255,255,255,0.94)" : "#ffffff",
       color: isDark ? "#0f172a" : "#1f2937",
@@ -463,7 +488,9 @@ function getStyles(theme) {
     select: {
       padding: "12px 14px",
       borderRadius: 16,
-      border: isDark ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(0,0,0,0.15)",
+      border: isDark
+        ? "1px solid rgba(255,255,255,0.18)"
+        : "1px solid rgba(0,0,0,0.15)",
       outline: "none",
       background: isDark ? "rgba(255,255,255,0.94)" : "#ffffff",
       color: isDark ? "#0f172a" : "#1f2937",
@@ -475,9 +502,13 @@ function getStyles(theme) {
       top: "100%",
       left: 0,
       right: 0,
-      background: isDark ? "rgba(8, 30, 15, 0.95)" : "rgba(255, 255, 255, 0.95)",
+      background: isDark
+        ? "rgba(8, 30, 15, 0.95)"
+        : "rgba(255, 255, 255, 0.95)",
       backdropFilter: "blur(14px)",
-      border: isDark ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(0,0,0,0.1)",
+      border: isDark
+        ? "1px solid rgba(255,255,255,0.18)"
+        : "1px solid rgba(0,0,0,0.1)",
       borderRadius: 12,
       marginTop: 4,
       maxHeight: 200,
@@ -490,7 +521,9 @@ function getStyles(theme) {
       cursor: "pointer",
       fontSize: 13,
       color: isDark ? "#fff" : "#1f2937",
-      borderBottom: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.05)",
+      borderBottom: isDark
+        ? "1px solid rgba(255,255,255,0.08)"
+        : "1px solid rgba(0,0,0,0.05)",
       transition: "background 0.2s",
     },
 
@@ -504,7 +537,9 @@ function getStyles(theme) {
     btn: {
       padding: "11px 18px",
       borderRadius: 999,
-      border: isDark ? "1px solid rgba(255,255,255,0.16)" : "1px solid rgba(0,0,0,0.1)",
+      border: isDark
+        ? "1px solid rgba(255,255,255,0.16)"
+        : "1px solid rgba(0,0,0,0.1)",
       background: isDark ? "rgba(7, 28, 14, 0.28)" : "rgba(0,0,0,0.05)",
       color: isDark ? "#fff" : "#1f2937",
       cursor: "pointer",
@@ -518,7 +553,9 @@ function getStyles(theme) {
     btnPrimary: {
       padding: "11px 18px",
       borderRadius: 999,
-      border: isDark ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(0,0,0,0.1)",
+      border: isDark
+        ? "1px solid rgba(255,255,255,0.18)"
+        : "1px solid rgba(0,0,0,0.1)",
       background: "linear-gradient(180deg, #dff7cf 0%, #8fcd67 100%)",
       color: "#12361c",
       cursor: "pointer",
@@ -531,7 +568,9 @@ function getStyles(theme) {
     btnDanger: {
       padding: "11px 18px",
       borderRadius: 999,
-      border: isDark ? "1px solid rgba(254,202,202,0.34)" : "1px solid rgba(220,38,38,0.3)",
+      border: isDark
+        ? "1px solid rgba(254,202,202,0.34)"
+        : "1px solid rgba(220,38,38,0.3)",
       background: "linear-gradient(180deg, #dc2626 0%, #991b1b 100%)",
       color: "#fff",
       cursor: "pointer",
@@ -544,7 +583,9 @@ function getStyles(theme) {
     btnWarning: {
       padding: "11px 18px",
       borderRadius: 999,
-      border: isDark ? "1px solid rgba(253,224,71,0.34)" : "1px solid rgba(245,158,11,0.3)",
+      border: isDark
+        ? "1px solid rgba(253,224,71,0.34)"
+        : "1px solid rgba(245,158,11,0.3)",
       background: "linear-gradient(180deg, #f59e0b 0%, #b45309 100%)",
       color: "#fff",
       cursor: "pointer",
@@ -557,7 +598,9 @@ function getStyles(theme) {
     btnSuccess: {
       padding: "11px 18px",
       borderRadius: 999,
-      border: isDark ? "1px solid rgba(110,231,183,0.34)" : "1px solid rgba(16,185,129,0.3)",
+      border: isDark
+        ? "1px solid rgba(110,231,183,0.34)"
+        : "1px solid rgba(16,185,129,0.3)",
       background: "linear-gradient(180deg, #10b981 0%, #059669 100%)",
       color: "#fff",
       cursor: "pointer",
@@ -571,7 +614,9 @@ function getStyles(theme) {
       overflowX: "auto",
       borderRadius: 18,
       background: isDark ? "rgba(6, 22, 11, 0.20)" : "rgba(255,255,255,0.5)",
-      border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.05)",
+      border: isDark
+        ? "1px solid rgba(255,255,255,0.08)"
+        : "1px solid rgba(0,0,0,0.05)",
       marginTop: 8,
     },
 
@@ -584,7 +629,9 @@ function getStyles(theme) {
       textAlign: "left",
       fontSize: 12,
       color: isDark ? "rgba(255,255,255,0.76)" : "#4b5563",
-      borderBottom: isDark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(0,0,0,0.08)",
+      borderBottom: isDark
+        ? "1px solid rgba(255,255,255,0.10)"
+        : "1px solid rgba(0,0,0,0.08)",
       padding: "12px 10px",
       whiteSpace: "nowrap",
       textTransform: "uppercase",
@@ -592,7 +639,9 @@ function getStyles(theme) {
     },
 
     td: {
-      borderBottom: isDark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.05)",
+      borderBottom: isDark
+        ? "1px solid rgba(255,255,255,0.07)"
+        : "1px solid rgba(0,0,0,0.05)",
       padding: "12px 10px",
       fontSize: 13,
       color: isDark ? "#fff" : "#1f2937",
@@ -604,14 +653,18 @@ function getStyles(theme) {
       padding: "4px 10px",
       borderRadius: 999,
       fontSize: 12,
-      border: isDark ? "1px solid rgba(254,202,202,0.42)" : "1px solid rgba(220,38,38,0.3)",
+      border: isDark
+        ? "1px solid rgba(254,202,202,0.42)"
+        : "1px solid rgba(220,38,38,0.3)",
       background: isDark ? "rgba(127,29,29,0.28)" : "rgba(239,68,68,0.1)",
       color: isDark ? "#fff1f2" : "#991b1b",
     },
 
     error: {
       background: isDark ? "rgba(127,29,29,0.35)" : "rgba(239,68,68,0.1)",
-      border: isDark ? "1px solid rgba(252,165,165,0.30)" : "1px solid rgba(239,68,68,0.3)",
+      border: isDark
+        ? "1px solid rgba(252,165,165,0.30)"
+        : "1px solid rgba(239,68,68,0.3)",
       padding: 12,
       borderRadius: 16,
       color: isDark ? "#fff1f2" : "#991b1b",
@@ -622,7 +675,9 @@ function getStyles(theme) {
 
     ok: {
       background: isDark ? "rgba(6,95,70,0.30)" : "rgba(16,185,129,0.1)",
-      border: isDark ? "1px solid rgba(110,231,183,0.28)" : "1px solid rgba(16,185,129,0.3)",
+      border: isDark
+        ? "1px solid rgba(110,231,183,0.28)"
+        : "1px solid rgba(16,185,129,0.3)",
       padding: 12,
       borderRadius: 16,
       color: isDark ? "#ecfdf5" : "#065f46",
@@ -667,7 +722,9 @@ function getStyles(theme) {
       alignItems: "center",
       gap: 12,
       padding: "12px 16px",
-      background: isDark ? "rgba(8, 30, 15, 0.8)" : "rgba(255, 255, 255, 0.9)",
+      background: isDark
+        ? "rgba(8, 30, 15, 0.8)"
+        : "rgba(255, 255, 255, 0.9)",
       backdropFilter: "blur(14px)",
       borderRadius: 16,
       marginBottom: 16,
@@ -689,8 +746,8 @@ export default function App() {
   const [txns, setTxns] = useState([]);
   const [selectedItems, setSelectedItems] = useState(new Set());
   const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    return savedTheme || 'dark';
+    const savedTheme = localStorage.getItem("theme");
+    return savedTheme || "dark";
   });
 
   const [message, setMessage] = useState(null);
@@ -733,42 +790,42 @@ export default function App() {
   const [importing, setImporting] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
 
-const isAdmin =
-  role === "admin" ||
-  (profile?.email || session?.user?.email) === "adminrpbdd@gmail.com";
-const isGuest = role === "guest";
+  const [editingItemId, setEditingItemId] = useState("");
+  const [editUnit, setEditUnit] = useState("pcs");
+  const [editCustomUnit, setEditCustomUnit] = useState("");
 
-useEffect(() => {
-  console.log({
-    role,
-    profile,
-    sessionEmail: session?.user?.email,
-    isAdmin,
-  });
-}, [role, profile, session, isAdmin]);
+  const isAdmin =
+    role === "admin" ||
+    (profile?.email || session?.user?.email) === "adminrpbdd@gmail.com";
+  const isGuest = role === "guest";
 
-  // Toggle theme function
+  useEffect(() => {
+    console.log({
+      role,
+      profile,
+      sessionEmail: session?.user?.email,
+      isAdmin,
+    });
+  }, [role, profile, session, isAdmin]);
+
   const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
+    localStorage.setItem("theme", newTheme);
   };
 
-  // Get styles based on current theme
   const styles = getStyles(theme);
 
-  // Get unique item names for autocomplete
   const itemNames = useMemo(() => {
-    const names = items.map(item => item.name.toLowerCase());
+    const names = items.map((item) => item.name.toLowerCase());
     return [...new Set(names)];
   }, [items]);
 
-  // Filter suggestions based on input
   const suggestions = useMemo(() => {
     if (!newName.trim()) return [];
     const inputLower = newName.toLowerCase();
     return itemNames
-      .filter(name => name.includes(inputLower) && name !== inputLower)
+      .filter((name) => name.includes(inputLower) && name !== inputLower)
       .slice(0, 5);
   }, [newName, itemNames]);
 
@@ -805,7 +862,6 @@ useEffect(() => {
     });
   }
 
-  // Row selection handlers
   function toggleItemSelection(itemId) {
     const newSelection = new Set(selectedItems);
     if (newSelection.has(itemId)) {
@@ -822,20 +878,66 @@ useEffect(() => {
       setSelectedItems(new Set());
       setSelectAll(false);
     } else {
-      const allIds = filteredItems.map(item => item.id);
+      const allIds = filteredItems.map((item) => item.id);
       setSelectedItems(new Set(allIds));
       setSelectAll(true);
     }
   }
 
-  // Bulk actions
+  function startEditUnit(item) {
+    if (!isAdmin) return showMessage("error", "Only admin can edit items.");
+
+    setEditingItemId(item.id);
+
+    if (UNIT_OPTIONS.includes(item.unit)) {
+      setEditUnit(item.unit);
+      setEditCustomUnit("");
+    } else {
+      setEditUnit("others");
+      setEditCustomUnit(item.unit || "");
+    }
+  }
+
+  function cancelEditUnit() {
+    setEditingItemId("");
+    setEditUnit("pcs");
+    setEditCustomUnit("");
+  }
+
+  async function saveItemUnit(itemId) {
+    if (!isAdmin) return showMessage("error", "Only admin can edit items.");
+
+    const finalUnit =
+      editUnit === "others" ? normalizeName(editCustomUnit || "") : editUnit;
+
+    if (!finalUnit) {
+      return showMessage("error", "Please select or enter a valid unit.");
+    }
+
+    const { error } = await supabase
+      .from("items")
+      .update({ unit: finalUnit })
+      .eq("id", itemId);
+
+    if (error) {
+      console.error("Update unit error:", error);
+      return showMessage("error", error.message);
+    }
+
+    await refreshData(itemId);
+    cancelEditUnit();
+    showMessage("ok", `Unit updated to "${finalUnit}".`);
+  }
+
   async function bulkRecycle() {
     if (selectedItems.size === 0) {
       showMessage("error", "No items selected");
       return;
     }
 
-    const confirm = window.confirm(`Move ${selectedItems.size} selected item(s) to Recycle Bin?`);
+    const confirm = window.confirm(
+      `Move ${selectedItems.size} selected item(s) to Recycle Bin?`
+    );
     if (!confirm) return;
 
     const deletedAt = new Date().toISOString();
@@ -853,13 +955,15 @@ useEffect(() => {
         console.error(`Failed to recycle item ${itemId}:`, itemErr);
       } else {
         successCount++;
-        
+
         const { error: txnErr } = await supabase
           .from("txns")
           .update({ deleted_at: deletedAt })
           .eq("item_id", itemId);
 
-        if (txnErr) console.error(`Failed to recycle transactions for item ${itemId}:`, txnErr);
+        if (txnErr) {
+          console.error(`Failed to recycle transactions for item ${itemId}:`, txnErr);
+        }
       }
     }
 
@@ -875,9 +979,12 @@ useEffect(() => {
       return;
     }
 
-    const newMinLevel = prompt("Enter new minimum stock level for selected items:", "10");
+    const newMinLevel = prompt(
+      "Enter new minimum stock level for selected items:",
+      "10"
+    );
     if (newMinLevel === null) return;
-    
+
     const minLevelNum = parseInt(newMinLevel);
     if (isNaN(minLevelNum) || minLevelNum < 0) {
       showMessage("error", "Please enter a valid number");
@@ -907,53 +1014,60 @@ useEffect(() => {
     showMessage("ok", `Updated ${successCount} items. Failed: ${errorCount}`);
   }
 
-  // Export functions
   function exportToExcel() {
-    const exportData = filteredItems.map(item => ({
+    const exportData = filteredItems.map((item) => ({
       "Item Name": item.name,
-      "Quantity": item.quantity,
-      "Unit": item.unit,
+      Quantity: item.quantity,
+      Unit: item.unit,
       "Minimum Level": item.min_level,
-      "Status": Number(item.quantity) <= Number(item.min_level) && Number(item.min_level) > 0 ? "Low Stock" : "OK",
-      "Last Updated": formatDate(item.updated_at)
+      Status:
+        Number(item.quantity) <= Number(item.min_level) && Number(item.min_level) > 0
+          ? "Low Stock"
+          : "OK",
+      "Last Updated": formatDate(item.updated_at),
     }));
 
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Inventory");
-    XLSX.writeFile(wb, `inventory_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.writeFile(wb, `inventory_${new Date().toISOString().split("T")[0]}.xlsx`);
     showMessage("ok", "Excel file exported successfully!");
   }
 
   function exportToPDF() {
     const doc = new jsPDF();
-    
-    // Add title
+
     doc.setFontSize(20);
     doc.setTextColor(0, 100, 0);
     doc.text("RPBDD Supplies Inventory Report", 14, 20);
-    
-    // Add date
+
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
     doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
-    
-    // Add summary
+
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
     doc.text(`Total Items: ${filteredItems.length}`, 14, 40);
-    doc.text(`Low Stock Items: ${filteredItems.filter(i => Number(i.quantity) <= Number(i.min_level) && Number(i.min_level) > 0).length}`, 14, 47);
-    
-    // Prepare table data
-    const tableData = filteredItems.map(item => [
+    doc.text(
+      `Low Stock Items: ${
+        filteredItems.filter(
+          (i) => Number(i.quantity) <= Number(i.min_level) && Number(i.min_level) > 0
+        ).length
+      }`,
+      14,
+      47
+    );
+
+    const tableData = filteredItems.map((item) => [
       item.name,
       item.quantity.toString(),
       item.unit,
       item.min_level.toString(),
-      Number(item.quantity) <= Number(item.min_level) && Number(item.min_level) > 0 ? "LOW" : "OK"
+      Number(item.quantity) <= Number(item.min_level) && Number(item.min_level) > 0
+        ? "LOW"
+        : "OK",
     ]);
-    
-    // Add table
+
     doc.autoTable({
       head: [["Item Name", "Quantity", "Unit", "Min Level", "Status"]],
       body: tableData,
@@ -962,46 +1076,50 @@ useEffect(() => {
       headStyles: { fillColor: [76, 175, 80], textColor: [255, 255, 255] },
       alternateRowStyles: { fillColor: [240, 240, 240] },
     });
-    
-    doc.save(`inventory_report_${new Date().toISOString().split('T')[0]}.pdf`);
+
+    doc.save(`inventory_report_${new Date().toISOString().split("T")[0]}.pdf`);
     showMessage("ok", "PDF report exported successfully!");
   }
 
-  // Export to CSV
   function exportToCSV() {
     try {
-      const csvData = filteredItems.map(item => ({
+      const csvData = filteredItems.map((item) => ({
         Name: item.name,
         Quantity: item.quantity,
         Unit: item.unit,
         "Min Level": item.min_level,
-        Status: Number(item.quantity) <= Number(item.min_level) && Number(item.min_level) > 0 ? "Low Stock" : "OK",
-        "Last Updated": formatDate(item.updated_at)
+        Status:
+          Number(item.quantity) <= Number(item.min_level) && Number(item.min_level) > 0
+            ? "Low Stock"
+            : "OK",
+        "Last Updated": formatDate(item.updated_at),
       }));
 
       const headers = Object.keys(csvData[0] || {});
       const csvRows = [
-        headers.join(','),
-        ...csvData.map(row => 
-          headers.map(header => 
-            JSON.stringify(row[header] || '', (key, value) => 
-              value === null ? '' : value
+        headers.join(","),
+        ...csvData.map((row) =>
+          headers
+            .map((header) =>
+              JSON.stringify(row[header] || "", (key, value) =>
+                value === null ? "" : value
+              )
             )
-          ).join(',')
-        )
+            .join(",")
+        ),
       ];
 
-      const csvString = csvRows.join('\n');
-      const blob = new Blob([csvString], { type: 'text/csv' });
+      const csvString = csvRows.join("\n");
+      const blob = new Blob([csvString], { type: "text/csv" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = `inventory_export_${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `inventory_export_${new Date().toISOString().split("T")[0]}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
+
       showMessage("ok", "CSV file exported successfully!");
     } catch (error) {
       console.error("Export error:", error);
@@ -1009,7 +1127,6 @@ useEffect(() => {
     }
   }
 
-  // Import from CSV
   async function importFromCSV(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -1020,22 +1137,22 @@ useEffect(() => {
     reader.onload = async (e) => {
       try {
         const text = e.target.result;
-        const rows = text.split('\n').filter(row => row.trim());
-        const headers = rows[0].split(',').map(h => h.replace(/["']/g, '').trim());
-        
+        const rows = text.split("\n").filter((row) => row.trim());
+        const headers = rows[0].split(",").map((h) => h.replace(/["']/g, "").trim());
+
         const itemsToImport = [];
-        
+
         for (let i = 1; i < rows.length; i++) {
-          const values = rows[i].split(',').map(v => v.replace(/["']/g, '').trim());
+          const values = rows[i].split(",").map((v) => v.replace(/["']/g, "").trim());
           const item = {};
-          
+
           headers.forEach((header, index) => {
-            if (header === 'Name') item.name = values[index];
-            if (header === 'Quantity') item.quantity = parseFloat(values[index]) || 0;
-            if (header === 'Unit') item.unit = values[index] || 'pcs';
-            if (header === 'Min Level') item.min_level = parseFloat(values[index]) || 0;
+            if (header === "Name") item.name = values[index];
+            if (header === "Quantity") item.quantity = parseFloat(values[index]) || 0;
+            if (header === "Unit") item.unit = values[index] || "pcs";
+            if (header === "Min Level") item.min_level = parseFloat(values[index]) || 0;
           });
-          
+
           if (item.name) {
             itemsToImport.push(item);
           }
@@ -1066,7 +1183,7 @@ useEffect(() => {
             console.error(`Failed to import ${item.name}:`, error);
           } else {
             successCount++;
-            
+
             if (item.quantity > 0 && inserted) {
               await supabase.from("txns").insert({
                 type: "IN",
@@ -1081,13 +1198,12 @@ useEffect(() => {
 
         await refreshData();
         showMessage("ok", `Imported ${successCount} items successfully. Failed: ${errorCount}`);
-        
       } catch (error) {
         console.error("Import error:", error);
         showMessage("error", `Import failed: ${error.message}`);
       } finally {
         setImporting(false);
-        event.target.value = '';
+        event.target.value = "";
       }
     };
 
@@ -1099,15 +1215,14 @@ useEffect(() => {
     reader.readAsText(file);
   }
 
-  // Apply filters to items
   const getFilteredItems = () => {
     let filtered = [...items];
-    
+
     const q = search.trim().toLowerCase();
     if (q) {
       filtered = filtered.filter((it) => it.name.toLowerCase().includes(q));
     }
-    
+
     switch (activeFilter) {
       case "low-stock":
         filtered = filtered.filter(
@@ -1115,26 +1230,21 @@ useEffect(() => {
         );
         break;
       case "in-stock":
-        filtered = filtered.filter(
-          (it) => Number(it.quantity) > Number(it.min_level)
-        );
+        filtered = filtered.filter((it) => Number(it.quantity) > Number(it.min_level));
         break;
       case "critical":
-        filtered = filtered.filter(
-          (it) => Number(it.quantity) === 0
-        );
+        filtered = filtered.filter((it) => Number(it.quantity) === 0);
         break;
-      case "recent":
+      case "recent": {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        filtered = filtered.filter(
-          (it) => new Date(it.updated_at) >= sevenDaysAgo
-        );
+        filtered = filtered.filter((it) => new Date(it.updated_at) >= sevenDaysAgo);
         break;
+      }
       default:
         break;
     }
-    
+
     return filtered;
   };
 
@@ -1277,6 +1387,7 @@ useEffect(() => {
     setSelectedItemId("");
     setLoginEmail("");
     setLoginPassword("");
+    setEditingItemId("");
     showMessage("ok", "Logged out.");
   }
 
@@ -1286,6 +1397,7 @@ useEffect(() => {
       setDeletedItems([]);
       setTxns([]);
       setSelectedItemId("");
+      setEditingItemId("");
       return;
     }
 
@@ -1322,8 +1434,7 @@ useEffect(() => {
     setTxns(txnsData ?? []);
 
     const nextSelected =
-      preferSelectedId &&
-      (itemsData ?? []).some((x) => x.id === preferSelectedId)
+      preferSelectedId && (itemsData ?? []).some((x) => x.id === preferSelectedId)
         ? preferSelectedId
         : itemsData?.[0]?.id ?? "";
 
@@ -1342,91 +1453,91 @@ useEffect(() => {
     refreshData();
   }, [session, role]);
 
-async function addItem(e) {
-  e.preventDefault();
+  async function addItem(e) {
+    e.preventDefault();
 
-  if (!isAdmin) return showMessage("error", "Only admin can add items.");
+    if (!isAdmin) return showMessage("error", "Only admin can add items.");
 
-  const name = normalizeName(newName);
-  const unit =
-    newUnit === "others"
-      ? normalizeName(customUnit || "pcs")
-      : newUnit.trim() || "pcs";
-  const qty = toNumber(newQty);
-  const minLevel = toNumber(newMin);
+    const name = normalizeName(newName);
+    const unit =
+      newUnit === "others"
+        ? normalizeName(customUnit || "pcs")
+        : newUnit.trim() || "pcs";
+    const qty = toNumber(newQty);
+    const minLevel = toNumber(newMin);
 
-  if (!name) return showMessage("error", "Item name is required.");
-  if (newUnit === "others" && !normalizeName(customUnit)) {
-    return showMessage("error", "Please specify the unit.");
-  }
-  if (!Number.isFinite(qty) || qty < 0) {
-    return showMessage("error", "Initial quantity must be 0 or more.");
-  }
-  if (!Number.isFinite(minLevel) || minLevel < 0) {
-    return showMessage("error", "Min level must be 0 or more.");
-  }
-
-  const { data: existingItem, error: findError } = await supabase
-    .from("items")
-    .select("*")
-    .eq("name", name)
-    .is("deleted_at", null)
-    .maybeSingle();
-
-  if (findError) {
-    console.error("Find item error:", findError);
-    return showMessage("error", findError.message);
-  }
-
-  if (existingItem) {
-    return showMessage(
-      "error",
-      `"${name}" already exists. Use Stock In instead of Add Supply.`
-    );
-  }
-
-  const { data: inserted, error } = await supabase
-    .from("items")
-    .insert({
-      name,
-      unit,
-      quantity: clampNonNegative(qty),
-      min_level: clampNonNegative(minLevel),
-      deleted_at: null,
-    })
-    .select("*")
-    .single();
-
-  if (error) {
-    console.error("Insert error:", error);
-    return showMessage("error", error.message);
-  }
-
-  if (qty > 0) {
-    const { error: txnErr } = await supabase.from("txns").insert({
-      type: "IN",
-      item_id: inserted.id,
-      qty,
-      note: "Initial stock",
-      deleted_at: null,
-    });
-
-    if (txnErr) {
-      console.error("Txn insert error:", txnErr);
-      return showMessage("error", txnErr.message);
+    if (!name) return showMessage("error", "Item name is required.");
+    if (newUnit === "others" && !normalizeName(customUnit)) {
+      return showMessage("error", "Please specify the unit.");
     }
+    if (!Number.isFinite(qty) || qty < 0) {
+      return showMessage("error", "Initial quantity must be 0 or more.");
+    }
+    if (!Number.isFinite(minLevel) || minLevel < 0) {
+      return showMessage("error", "Min level must be 0 or more.");
+    }
+
+    const { data: existingItem, error: findError } = await supabase
+      .from("items")
+      .select("*")
+      .eq("name", name)
+      .is("deleted_at", null)
+      .maybeSingle();
+
+    if (findError) {
+      console.error("Find item error:", findError);
+      return showMessage("error", findError.message);
+    }
+
+    if (existingItem) {
+      return showMessage(
+        "error",
+        `"${name}" already exists. Use Stock In instead of Add Supply.`
+      );
+    }
+
+    const { data: inserted, error } = await supabase
+      .from("items")
+      .insert({
+        name,
+        unit,
+        quantity: clampNonNegative(qty),
+        min_level: clampNonNegative(minLevel),
+        deleted_at: null,
+      })
+      .select("*")
+      .single();
+
+    if (error) {
+      console.error("Insert error:", error);
+      return showMessage("error", error.message);
+    }
+
+    if (qty > 0) {
+      const { error: txnErr } = await supabase.from("txns").insert({
+        type: "IN",
+        item_id: inserted.id,
+        qty,
+        note: "Initial stock",
+        deleted_at: null,
+      });
+
+      if (txnErr) {
+        console.error("Txn insert error:", txnErr);
+        return showMessage("error", txnErr.message);
+      }
+    }
+
+    setNewName("");
+    setNewQty("0");
+    setNewMin("0");
+    setNewUnit("ream");
+    setCustomUnit("");
+    setShowSuggestions(false);
+
+    await refreshData(inserted.id);
+    showMessage("ok", `Added "${name}".`);
   }
-
-  setNewName("");
-  setNewQty("0");
-  setNewMin("0");
-  setNewUnit("ream");
-  setCustomUnit("");
-  setShowSuggestions(false);
-
-  await refreshData(inserted.id);
-  showMessage("ok", `Added "${name}".`);
-}
 
   async function applyTxn(e) {
     e.preventDefault();
@@ -1526,10 +1637,7 @@ async function addItem(e) {
     );
     if (!yes) return;
 
-    const { error: txErr } = await supabase
-      .from("txns")
-      .delete()
-      .eq("item_id", itemId);
+    const { error: txErr } = await supabase.from("txns").delete().eq("item_id", itemId);
     if (txErr) return showMessage("error", txErr.message);
 
     const { error: itErr } = await supabase.from("items").delete().eq("id", itemId);
@@ -1610,17 +1718,16 @@ async function addItem(e) {
     connStatus === "ok"
       ? { ...styles.badge, ...styles.badgeOk }
       : connStatus === "error"
-        ? { ...styles.badge, ...styles.badgeErr }
-        : { ...styles.badge, ...styles.badgeChecking };
+      ? { ...styles.badge, ...styles.badgeErr }
+      : { ...styles.badge, ...styles.badgeChecking };
 
   const connLabel =
     connStatus === "ok"
       ? "DB: OK"
       : connStatus === "error"
-        ? "DB: ERROR"
-        : "DB: CHECKING";
+      ? "DB: ERROR"
+      : "DB: CHECKING";
 
-  // Breadcrumb navigation component
   const BreadcrumbNavigation = () => (
     <div style={styles.breadcrumbContainer}>
       <div
@@ -1695,7 +1802,6 @@ async function addItem(e) {
     </div>
   );
 
-  // Quick filters component
   const QuickFilters = () => (
     <div style={styles.filterContainer}>
       <div style={styles.filterTitle}>
@@ -1920,20 +2026,21 @@ async function addItem(e) {
 
             <div style={styles.subtle}>
               {isAdmin
-                ? `Manual input of supplies. Stock-out automatically subtracts quantity.${lowCount > 0 ? ` • Low stock alerts: ${lowCount}` : ""}`
+                ? `Manual input of supplies. Stock-out automatically subtracts quantity.${
+                    lowCount > 0 ? ` • Low stock alerts: ${lowCount}` : ""
+                  }`
                 : "Guest view: you can view items and transaction history only."}
             </div>
           </div>
 
           <div style={styles.buttonRow}>
-            {/* Theme Switcher Button */}
             <FancyButton
               style={styles.btn}
               onClick={toggleTheme}
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              icon={theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              icon={theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
             >
-              {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+              {theme === "dark" ? "Light Mode" : "Dark Mode"}
             </FancyButton>
 
             {isAdmin && (
@@ -1947,7 +2054,6 @@ async function addItem(e) {
                   Excel
                 </FancyButton>
 
-
                 <FancyButton
                   style={styles.btnPrimary}
                   onClick={exportToCSV}
@@ -1956,7 +2062,7 @@ async function addItem(e) {
                 >
                   CSV
                 </FancyButton>
-                
+
                 <label htmlFor="csv-import" style={{ margin: 0 }}>
                   <input
                     id="csv-import"
@@ -1968,7 +2074,7 @@ async function addItem(e) {
                   />
                   <FancyButton
                     style={styles.btnPrimary}
-                    onClick={() => document.getElementById('csv-import').click()}
+                    onClick={() => document.getElementById("csv-import").click()}
                     title="Import inventory from CSV"
                     icon={<Upload size={16} />}
                   >
@@ -1989,11 +2095,7 @@ async function addItem(e) {
               </FancyButton>
             )}
 
-            <FancyButton
-              style={styles.btn}
-              onClick={handleLogout}
-              icon={<LogOut size={16} />}
-            >
+            <FancyButton style={styles.btn} onClick={handleLogout} icon={<LogOut size={16} />}>
               Logout
             </FancyButton>
           </div>
@@ -2040,8 +2142,15 @@ async function addItem(e) {
                             setNewName(suggestion);
                             setShowSuggestions(false);
                           }}
-                          onMouseEnter={(e) => e.target.style.background = theme === 'dark' ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"}
-                          onMouseLeave={(e) => e.target.style.background = "transparent"}
+                          onMouseEnter={(e) => {
+                            e.target.style.background =
+                              theme === "dark"
+                                ? "rgba(255,255,255,0.1)"
+                                : "rgba(0,0,0,0.05)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.background = "transparent";
+                          }}
                         >
                           {suggestion}
                         </div>
@@ -2196,7 +2305,8 @@ async function addItem(e) {
               </form>
 
               <div style={styles.helperText}>
-                Example: If you added <b>100</b> then Stock Out <b>50</b>, remaining becomes <b>50</b>.
+                Example: If you added <b>100</b> then Stock Out <b>50</b>, remaining becomes{" "}
+                <b>50</b>.
               </div>
             </motion.div>
           )}
@@ -2212,14 +2322,10 @@ async function addItem(e) {
               <Package2 size={18} />
               Items
               {activeFilter !== "all" && (
-                <span style={styles.badge}>
-                  Filtered: {filteredItems.length} items
-                </span>
+                <span style={styles.badge}>Filtered: {filteredItems.length} items</span>
               )}
               {selectedItems.size > 0 && (
-                <span style={styles.badge}>
-                  {selectedItems.size} selected
-                </span>
+                <span style={styles.badge}>{selectedItems.size} selected</span>
               )}
             </h2>
 
@@ -2301,7 +2407,7 @@ async function addItem(e) {
                     <th style={styles.th}>Low stock</th>
                     <th style={styles.th}>Updated</th>
                     <th style={styles.th}>Actions</th>
-                   </tr>
+                  </tr>
                 </thead>
                 <tbody>
                   {filteredItems.length === 0 ? (
@@ -2332,7 +2438,41 @@ async function addItem(e) {
                           <td style={styles.td}>
                             <b>{it.quantity}</b>
                           </td>
-                          <td style={styles.td}>{it.unit}</td>
+                          <td style={styles.td}>
+                            {editingItemId === it.id ? (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: 8,
+                                  minWidth: 140,
+                                }}
+                              >
+                                <select
+                                  style={styles.select}
+                                  value={editUnit}
+                                  onChange={(e) => setEditUnit(e.target.value)}
+                                >
+                                  {UNIT_OPTIONS.map((unit) => (
+                                    <option key={unit} value={unit}>
+                                      {unit === "others" ? "Others" : unit}
+                                    </option>
+                                  ))}
+                                </select>
+
+                                {editUnit === "others" && (
+                                  <input
+                                    style={styles.input}
+                                    value={editCustomUnit}
+                                    onChange={(e) => setEditCustomUnit(e.target.value)}
+                                    placeholder="Enter unit"
+                                  />
+                                )}
+                              </div>
+                            ) : (
+                              it.unit
+                            )}
+                          </td>
                           <td style={styles.td}>
                             {Number(it.min_level) > 0 ? (
                               <span style={isLow ? styles.badgeLow : styles.badge}>
@@ -2347,23 +2487,53 @@ async function addItem(e) {
                             <div style={styles.buttonRow}>
                               {isAdmin ? (
                                 <>
-                                  <FancyButton
-                                    type="button"
-                                    style={styles.btn}
-                                    onClick={() => handleSelectItem(it.id)}
-                                    icon={<Activity size={15} />}
-                                  >
-                                    Select
-                                  </FancyButton>
+                                  {editingItemId === it.id ? (
+                                    <>
+                                      <FancyButton
+                                        type="button"
+                                        style={styles.btnSuccess}
+                                        onClick={() => saveItemUnit(it.id)}
+                                      >
+                                        Save Unit
+                                      </FancyButton>
 
-                                  <FancyButton
-                                    type="button"
-                                    style={styles.btnWarning}
-                                    onClick={() => deleteItem(it.id)}
-                                    icon={<Archive size={15} />}
-                                  >
-                                    Recycle
-                                  </FancyButton>
+                                      <FancyButton
+                                        type="button"
+                                        style={styles.btn}
+                                        onClick={cancelEditUnit}
+                                      >
+                                        Cancel
+                                      </FancyButton>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <FancyButton
+                                        type="button"
+                                        style={styles.btn}
+                                        onClick={() => handleSelectItem(it.id)}
+                                        icon={<Activity size={15} />}
+                                      >
+                                        Select
+                                      </FancyButton>
+
+                                      <FancyButton
+                                        type="button"
+                                        style={styles.btnPrimary}
+                                        onClick={() => startEditUnit(it)}
+                                      >
+                                        Edit Unit
+                                      </FancyButton>
+
+                                      <FancyButton
+                                        type="button"
+                                        style={styles.btnWarning}
+                                        onClick={() => deleteItem(it.id)}
+                                        icon={<Archive size={15} />}
+                                      >
+                                        Recycle
+                                      </FancyButton>
+                                    </>
+                                  )}
                                 </>
                               ) : (
                                 <span style={styles.badge}>View only</span>
