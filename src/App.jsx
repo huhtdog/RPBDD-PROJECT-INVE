@@ -14,7 +14,6 @@ import {
   Archive,
   LogOut,
   ShieldCheck,
-  Home,
   Filter,
   Clock,
   X,
@@ -90,7 +89,6 @@ function FancyButton({ children, style, icon, ...props }) {
   );
 }
 
-// Theme configuration
 const themes = {
   dark: {
     page: {
@@ -107,39 +105,23 @@ const themes = {
       background: "rgba(8, 30, 15, 0.24)",
       border: "1px solid rgba(255,255,255,0.12)",
     },
-    input: {
-      background: "rgba(255,255,255,0.94)",
-      color: "#0f172a",
-    },
     text: "#ffffff",
-    textSecondary: "rgba(255,255,255,0.78)",
-    border: "rgba(255,255,255,0.12)",
-    badgeBg: "rgba(7, 28, 14, 0.22)",
-    filterBg: "rgba(8, 30, 15, 0.24)",
   },
   light: {
     page: {
-      background: "linear-gradient(135deg, #f5f7fa 0%, #e8f0e8 100%)",
+      background: "linear-gradient(135deg, #f5f7fa 0%, #eceff3 100%)",
       color: "#1f2937",
     },
     hero: {
       background:
-        "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,255,240,0.9))",
-      border: "1px solid rgba(0,0,0,0.1)",
+        "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(250,250,250,0.92))",
+      border: "1px solid rgba(0, 0, 0, 0.08)",
     },
     card: {
-      background: "rgba(255, 255, 255, 0.85)",
+      background: "rgba(255,255,255,0.88)",
       border: "1px solid rgba(0,0,0,0.08)",
     },
-    input: {
-      background: "#ffffff",
-      color: "#1f2937",
-    },
     text: "#1f2937",
-    textSecondary: "#4b5563",
-    border: "rgba(0,0,0,0.1)",
-    badgeBg: "rgba(0,0,0,0.05)",
-    filterBg: "rgba(255, 255, 255, 0.7)",
   },
 };
 
@@ -165,14 +147,14 @@ function getStyles(theme) {
     hero: {
       position: "relative",
       overflow: "hidden",
-      borderRadius: 30,
+      borderRadius: 26,
       padding: "28px 28px 34px",
       marginBottom: 24,
       background: isDark ? themes.dark.hero.background : themes.light.hero.background,
       border: isDark ? themes.dark.hero.border : themes.light.hero.border,
       boxShadow: isDark
         ? "0 24px 70px rgba(0,0,0,0.28)"
-        : "0 24px 50px rgba(0,0,0,0.1)",
+        : "0 24px 50px rgba(0,0,0,0.08)",
       backdropFilter: "blur(14px)",
       display: "flex",
       flexDirection: "column",
@@ -188,19 +170,19 @@ function getStyles(theme) {
       width: 280,
       height: 280,
       borderRadius: "50%",
-      background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,100,0,0.05)",
+      background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
       filter: "blur(24px)",
       pointerEvents: "none",
     },
 
     heroTitle: {
       margin: 0,
-      fontSize: "clamp(44px, 10vw, 118px)",
-      lineHeight: 0.88,
+      fontSize: "clamp(38px, 9vw, 100px)",
+      lineHeight: 0.92,
       fontWeight: 900,
       letterSpacing: "-0.06em",
       textTransform: "uppercase",
-      color: isDark ? "rgba(255,255,255,0.92)" : "#0f3d1e",
+      color: isDark ? "rgba(255,255,255,0.92)" : "#111827",
       position: "relative",
       zIndex: 1,
     },
@@ -222,9 +204,9 @@ function getStyles(theme) {
       gap: 8,
       padding: "8px 14px",
       borderRadius: 999,
-      background: isDark ? "rgba(7, 28, 14, 0.26)" : "rgba(255, 255, 255, 0.8)",
+      background: isDark ? "rgba(7, 28, 14, 0.26)" : "rgba(255,255,255,0.92)",
       border: isDark
-        ? "1px solid rgba(255,255,255,0.12)"
+        ? "1px solid rgba(255,255,255,0.10)"
         : "1px solid rgba(0,0,0,0.08)",
       color: isDark ? "#fff" : "#1f2937",
       fontSize: 12,
@@ -240,9 +222,9 @@ function getStyles(theme) {
       gap: 8,
       padding: "8px 14px",
       borderRadius: 999,
-      background: isDark ? "rgba(7, 28, 14, 0.26)" : "rgba(255, 255, 255, 0.8)",
+      background: isDark ? "rgba(7, 28, 14, 0.26)" : "rgba(255,255,255,0.92)",
       border: isDark
-        ? "1px solid rgba(255,255,255,0.12)"
+        ? "1px solid rgba(255,255,255,0.10)"
         : "1px solid rgba(0,0,0,0.08)",
       color: isDark ? "#fff" : "#1f2937",
       fontSize: 12,
@@ -253,43 +235,46 @@ function getStyles(theme) {
       cursor: "pointer",
     },
 
-    breadcrumbContainer: {
+    topTabsWrap: {
       display: "flex",
-      alignItems: "center",
-      gap: 8,
-      marginBottom: 20,
-      padding: "8px 0",
+      gap: 12,
       flexWrap: "wrap",
+      marginBottom: 24,
+      paddingBottom: 12,
+      borderBottom: isDark
+        ? "1px solid rgba(255,255,255,0.08)"
+        : "1px solid rgba(0,0,0,0.08)",
     },
 
-    breadcrumbItem: {
-      display: "flex",
-      alignItems: "center",
-      gap: 8,
-      fontSize: 13,
-      color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.6)",
+    topTab: {
+      padding: "11px 18px",
+      borderRadius: 12,
+      border: isDark
+        ? "1px solid rgba(255,255,255,0.08)"
+        : "1px solid rgba(0,0,0,0.08)",
+      background: "transparent",
+      color: isDark ? "rgba(255,255,255,0.75)" : "#4b5563",
+      fontSize: 15,
+      fontWeight: 500,
       cursor: "pointer",
-      transition: "color 0.2s",
+      transition: "all 0.2s ease",
     },
 
-    breadcrumbActive: {
-      color: isDark ? "#fff" : "#0f3d1e",
-      fontWeight: 600,
-    },
-
-    breadcrumbSeparator: {
-      color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.3)",
-      fontSize: 12,
+    topTabActive: {
+      background: "linear-gradient(180deg, #dff7cf 0%, #8fcd67 100%)",
+      color: "#12361c",
+      border: "1px solid rgba(255,255,255,0.16)",
+      fontWeight: 700,
     },
 
     filterContainer: {
       marginBottom: 20,
       padding: "12px 16px",
-      background: isDark ? "rgba(8, 30, 15, 0.24)" : "rgba(255, 255, 255, 0.7)",
+      background: isDark ? "rgba(8, 30, 15, 0.24)" : "rgba(255,255,255,0.7)",
       backdropFilter: "blur(14px)",
       borderRadius: 20,
       border: isDark
-        ? "1px solid rgba(255,255,255,0.12)"
+        ? "1px solid rgba(255,255,255,0.08)"
         : "1px solid rgba(0,0,0,0.08)",
     },
 
@@ -315,10 +300,10 @@ function getStyles(theme) {
       gap: 6,
       padding: "6px 14px",
       borderRadius: 999,
-      background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)",
+      background: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
       border: isDark
-        ? "1px solid rgba(255,255,255,0.15)"
-        : "1px solid rgba(0,0,0,0.1)",
+        ? "1px solid rgba(255,255,255,0.10)"
+        : "1px solid rgba(0,0,0,0.08)",
       color: isDark ? "rgba(255,255,255,0.85)" : "#374151",
       fontSize: 12,
       fontWeight: 500,
@@ -327,16 +312,16 @@ function getStyles(theme) {
     },
 
     filterChipActive: {
-      background: "linear-gradient(135deg, #dff7cf 0%, #8fcd67 100%)",
+      background: "linear-gradient(180deg, #dff7cf 0%, #8fcd67 100%)",
       color: "#12361c",
       borderColor: "rgba(255,255,255,0.3)",
     },
 
     filterChipClear: {
-      background: isDark ? "rgba(220,38,38,0.2)" : "rgba(220,38,38,0.1)",
+      background: isDark ? "rgba(220,38,38,0.18)" : "rgba(220,38,38,0.08)",
       borderColor: isDark
-        ? "rgba(252,165,165,0.3)"
-        : "rgba(220,38,38,0.3)",
+        ? "rgba(252,165,165,0.25)"
+        : "rgba(220,38,38,0.2)",
       color: isDark ? "#fff1f2" : "#991b1b",
     },
 
@@ -352,7 +337,7 @@ function getStyles(theme) {
     h1: {
       margin: 0,
       fontSize: 28,
-      color: isDark ? "#ffffff" : "#0f3d1e",
+      color: isDark ? "#ffffff" : "#111827",
       letterSpacing: "-0.03em",
     },
 
@@ -381,9 +366,9 @@ function getStyles(theme) {
       borderRadius: 999,
       fontSize: 12,
       border: isDark
-        ? "1px solid rgba(255,255,255,0.12)"
+        ? "1px solid rgba(255,255,255,0.10)"
         : "1px solid rgba(0,0,0,0.08)",
-      background: isDark ? "rgba(7, 28, 14, 0.22)" : "rgba(0,0,0,0.05)",
+      background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.05)",
       color: isDark ? "#fff" : "#1f2937",
       userSelect: "none",
       backdropFilter: "blur(8px)",
@@ -391,71 +376,41 @@ function getStyles(theme) {
 
     badgeOk: {
       border: isDark
-        ? "1px solid rgba(134,239,172,0.40)"
+        ? "1px solid rgba(134,239,172,0.30)"
         : "1px solid #10b981",
-      background: isDark ? "rgba(22,163,74,0.20)" : "rgba(16,185,129,0.1)",
+      background: isDark ? "rgba(22,163,74,0.16)" : "rgba(16,185,129,0.1)",
       color: isDark ? "#f0fdf4" : "#065f46",
     },
 
     badgeErr: {
       border: isDark
-        ? "1px solid rgba(252,165,165,0.45)"
+        ? "1px solid rgba(252,165,165,0.30)"
         : "1px solid #ef4444",
-      background: isDark ? "rgba(220,38,38,0.20)" : "rgba(239,68,68,0.1)",
+      background: isDark ? "rgba(220,38,38,0.18)" : "rgba(239,68,68,0.1)",
       color: isDark ? "#fff1f2" : "#991b1b",
     },
 
     badgeChecking: {
       border: isDark
-        ? "1px solid rgba(125,211,252,0.40)"
+        ? "1px solid rgba(125,211,252,0.30)"
         : "1px solid #3b82f6",
-      background: isDark ? "rgba(2,132,199,0.20)" : "rgba(59,130,246,0.1)",
+      background: isDark ? "rgba(2,132,199,0.16)" : "rgba(59,130,246,0.1)",
       color: isDark ? "#f0f9ff" : "#1e40af",
-    },
-
-    grid: {
-      display: "grid",
-      gridTemplateColumns: "repeat(2, 1fr)",
-      gap: 20,
-      alignItems: "start",
-      marginBottom: 24,
     },
 
     card: {
       border: isDark
-        ? "1px solid rgba(255,255,255,0.12)"
+        ? "1px solid rgba(255,255,255,0.10)"
         : "1px solid rgba(0,0,0,0.08)",
       borderRadius: 24,
       padding: 20,
       boxShadow: isDark
-        ? "0 20px 50px rgba(0,0,0,0.20)"
+        ? "0 20px 50px rgba(0,0,0,0.18)"
         : "0 10px 30px rgba(0,0,0,0.05)",
-      background: isDark ? "rgba(8, 30, 15, 0.24)" : "rgba(255, 255, 255, 0.85)",
+      background: isDark ? "rgba(8, 30, 15, 0.24)" : "rgba(255, 255, 255, 0.88)",
       backdropFilter: "blur(14px)",
       color: isDark ? "#fff" : "#1f2937",
-      height: "100%",
-    },
-
-    cardFull: {
-      gridColumn: "1 / -1",
-      marginBottom: 0,
-    },
-
-    cardTitle: {
-      margin: "0 0 16px 0",
-      fontSize: 18,
-      fontWeight: 800,
-      color: isDark ? "#fff" : "#0f3d1e",
-      letterSpacing: "-0.02em",
-      display: "flex",
-      alignItems: "center",
-      gap: 8,
-    },
-
-    row: {
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-      gap: 12,
+      marginBottom: 22,
     },
 
     field: {
@@ -473,15 +428,21 @@ function getStyles(theme) {
       letterSpacing: "0.08em",
     },
 
+    row: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+      gap: 12,
+    },
+
     input: {
       padding: "12px 14px",
       borderRadius: 16,
       border: isDark
-        ? "1px solid rgba(255,255,255,0.18)"
-        : "1px solid rgba(0,0,0,0.15)",
+        ? "1px solid rgba(255,255,255,0.12)"
+        : "1px solid rgba(0,0,0,0.12)",
       outline: "none",
-      background: isDark ? "rgba(255,255,255,0.94)" : "#ffffff",
-      color: isDark ? "#0f172a" : "#1f2937",
+      background: isDark ? "rgba(255,255,255,0.95)" : "#ffffff",
+      color: "#111827",
       fontSize: 14,
     },
 
@@ -489,11 +450,11 @@ function getStyles(theme) {
       padding: "12px 14px",
       borderRadius: 16,
       border: isDark
-        ? "1px solid rgba(255,255,255,0.18)"
-        : "1px solid rgba(0,0,0,0.15)",
+        ? "1px solid rgba(255,255,255,0.12)"
+        : "1px solid rgba(0,0,0,0.12)",
       outline: "none",
-      background: isDark ? "rgba(255,255,255,0.94)" : "#ffffff",
-      color: isDark ? "#0f172a" : "#1f2937",
+      background: isDark ? "rgba(255,255,255,0.95)" : "#ffffff",
+      color: "#111827",
       fontSize: 14,
     },
 
@@ -502,13 +463,11 @@ function getStyles(theme) {
       top: "100%",
       left: 0,
       right: 0,
-      background: isDark
-        ? "rgba(8, 30, 15, 0.95)"
-        : "rgba(255, 255, 255, 0.95)",
+      background: isDark ? "rgba(8, 30, 15, 0.95)" : "rgba(255,255,255,0.95)",
       backdropFilter: "blur(14px)",
       border: isDark
-        ? "1px solid rgba(255,255,255,0.18)"
-        : "1px solid rgba(0,0,0,0.1)",
+        ? "1px solid rgba(255,255,255,0.12)"
+        : "1px solid rgba(0,0,0,0.08)",
       borderRadius: 12,
       marginTop: 4,
       maxHeight: 200,
@@ -522,8 +481,8 @@ function getStyles(theme) {
       fontSize: 13,
       color: isDark ? "#fff" : "#1f2937",
       borderBottom: isDark
-        ? "1px solid rgba(255,255,255,0.08)"
-        : "1px solid rgba(0,0,0,0.05)",
+        ? "1px solid rgba(255,255,255,0.06)"
+        : "1px solid rgba(0,0,0,0.04)",
       transition: "background 0.2s",
     },
 
@@ -538,9 +497,9 @@ function getStyles(theme) {
       padding: "11px 18px",
       borderRadius: 999,
       border: isDark
-        ? "1px solid rgba(255,255,255,0.16)"
+        ? "1px solid rgba(255,255,255,0.12)"
         : "1px solid rgba(0,0,0,0.1)",
-      background: isDark ? "rgba(7, 28, 14, 0.28)" : "rgba(0,0,0,0.05)",
+      background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
       color: isDark ? "#fff" : "#1f2937",
       cursor: "pointer",
       fontWeight: 800,
@@ -553,16 +512,14 @@ function getStyles(theme) {
     btnPrimary: {
       padding: "11px 18px",
       borderRadius: 999,
-      border: isDark
-        ? "1px solid rgba(255,255,255,0.18)"
-        : "1px solid rgba(0,0,0,0.1)",
+      border: "1px solid rgba(255,255,255,0.18)",
       background: "linear-gradient(180deg, #dff7cf 0%, #8fcd67 100%)",
       color: "#12361c",
       cursor: "pointer",
       fontWeight: 900,
       letterSpacing: "0.04em",
       textTransform: "uppercase",
-      boxShadow: "0 12px 30px rgba(0,0,0,0.22)",
+      boxShadow: "0 12px 30px rgba(0,0,0,0.16)",
     },
 
     btnDanger: {
@@ -615,7 +572,7 @@ function getStyles(theme) {
       borderRadius: 18,
       background: isDark ? "rgba(6, 22, 11, 0.20)" : "rgba(255,255,255,0.5)",
       border: isDark
-        ? "1px solid rgba(255,255,255,0.08)"
+        ? "1px solid rgba(255,255,255,0.06)"
         : "1px solid rgba(0,0,0,0.05)",
       marginTop: 8,
     },
@@ -630,7 +587,7 @@ function getStyles(theme) {
       fontSize: 12,
       color: isDark ? "rgba(255,255,255,0.76)" : "#4b5563",
       borderBottom: isDark
-        ? "1px solid rgba(255,255,255,0.10)"
+        ? "1px solid rgba(255,255,255,0.08)"
         : "1px solid rgba(0,0,0,0.08)",
       padding: "12px 10px",
       whiteSpace: "nowrap",
@@ -640,7 +597,7 @@ function getStyles(theme) {
 
     td: {
       borderBottom: isDark
-        ? "1px solid rgba(255,255,255,0.07)"
+        ? "1px solid rgba(255,255,255,0.05)"
         : "1px solid rgba(0,0,0,0.05)",
       padding: "12px 10px",
       fontSize: 13,
@@ -661,9 +618,9 @@ function getStyles(theme) {
     },
 
     error: {
-      background: isDark ? "rgba(127,29,29,0.35)" : "rgba(239,68,68,0.1)",
+      background: isDark ? "rgba(127,29,29,0.30)" : "rgba(239,68,68,0.1)",
       border: isDark
-        ? "1px solid rgba(252,165,165,0.30)"
+        ? "1px solid rgba(252,165,165,0.24)"
         : "1px solid rgba(239,68,68,0.3)",
       padding: 12,
       borderRadius: 16,
@@ -674,9 +631,9 @@ function getStyles(theme) {
     },
 
     ok: {
-      background: isDark ? "rgba(6,95,70,0.30)" : "rgba(16,185,129,0.1)",
+      background: isDark ? "rgba(6,95,70,0.24)" : "rgba(16,185,129,0.1)",
       border: isDark
-        ? "1px solid rgba(110,231,183,0.28)"
+        ? "1px solid rgba(110,231,183,0.24)"
         : "1px solid rgba(16,185,129,0.3)",
       padding: 12,
       borderRadius: 16,
@@ -722,9 +679,7 @@ function getStyles(theme) {
       alignItems: "center",
       gap: 12,
       padding: "12px 16px",
-      background: isDark
-        ? "rgba(8, 30, 15, 0.8)"
-        : "rgba(255, 255, 255, 0.9)",
+      background: isDark ? "rgba(8, 30, 15, 0.8)" : "rgba(255, 255, 255, 0.9)",
       backdropFilter: "blur(14px)",
       borderRadius: 16,
       marginBottom: 16,
@@ -752,10 +707,6 @@ export default function App() {
 
   const [message, setMessage] = useState(null);
   const msgTimerRef = useRef(null);
-  const txnSectionRef = useRef(null);
-  const itemsSectionRef = useRef(null);
-  const binSectionRef = useRef(null);
-  const addSupplySectionRef = useRef(null);
 
   const [newName, setNewName] = useState("");
   const [newUnit, setNewUnit] = useState("ream");
@@ -808,6 +759,14 @@ export default function App() {
     });
   }, [role, profile, session, isAdmin]);
 
+  useEffect(() => {
+    if (isAdmin) {
+      setCurrentSection("add-supply");
+    } else {
+      setCurrentSection("items");
+    }
+  }, [isAdmin]);
+
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
@@ -839,20 +798,6 @@ export default function App() {
     if (!isAdmin) return;
     setSelectedItemId(itemId);
     setCurrentSection("transactions");
-    txnSectionRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  }
-
-  function scrollToSection(ref, sectionName) {
-    setCurrentSection(sectionName);
-    if (ref.current) {
-      ref.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
   }
 
   function scrollToTop() {
@@ -1038,7 +983,7 @@ export default function App() {
     const doc = new jsPDF();
 
     doc.setFontSize(20);
-    doc.setTextColor(0, 100, 0);
+    doc.setTextColor(0, 0, 0);
     doc.text("RPBDD Supplies Inventory Report", 14, 20);
 
     doc.setFontSize(10);
@@ -1728,80 +1673,6 @@ export default function App() {
       ? "DB: ERROR"
       : "DB: CHECKING";
 
-  const BreadcrumbNavigation = () => (
-    <div style={styles.breadcrumbContainer}>
-      <div
-        style={{
-          ...styles.breadcrumbItem,
-          ...(currentSection === "home" ? styles.breadcrumbActive : {}),
-        }}
-        onClick={() => {
-          setCurrentSection("home");
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }}
-      >
-        <Home size={14} />
-        <span>Home</span>
-      </div>
-      <span style={styles.breadcrumbSeparator}>/</span>
-      <div
-        style={{
-          ...styles.breadcrumbItem,
-          ...(currentSection === "items" ? styles.breadcrumbActive : {}),
-        }}
-        onClick={() => scrollToSection(itemsSectionRef, "items")}
-      >
-        <Package2 size={14} />
-        <span>Items</span>
-      </div>
-      {isAdmin && (
-        <>
-          <span style={styles.breadcrumbSeparator}>/</span>
-          <div
-            style={{
-              ...styles.breadcrumbItem,
-              ...(currentSection === "add-supply" ? styles.breadcrumbActive : {}),
-            }}
-            onClick={() => scrollToSection(addSupplySectionRef, "add-supply")}
-          >
-            <Plus size={14} />
-            <span>Add Supply</span>
-          </div>
-        </>
-      )}
-      {isAdmin && (
-        <>
-          <span style={styles.breadcrumbSeparator}>/</span>
-          <div
-            style={{
-              ...styles.breadcrumbItem,
-              ...(currentSection === "transactions" ? styles.breadcrumbActive : {}),
-            }}
-            onClick={() => scrollToSection(txnSectionRef, "transactions")}
-          >
-            <ArrowDownUp size={14} />
-            <span>Transactions</span>
-          </div>
-        </>
-      )}
-      {isAdmin && deletedItems.length > 0 && (
-        <>
-          <span style={styles.breadcrumbSeparator}>/</span>
-          <div
-            style={{
-              ...styles.breadcrumbItem,
-              ...(currentSection === "recycle-bin" ? styles.breadcrumbActive : {}),
-            }}
-            onClick={() => scrollToSection(binSectionRef, "recycle-bin")}
-          >
-            <Archive size={14} />
-            <span>Recycle Bin</span>
-          </div>
-        </>
-      )}
-    </div>
-  );
-
   const QuickFilters = () => (
     <div style={styles.filterContainer}>
       <div style={styles.filterTitle}>
@@ -1871,6 +1742,39 @@ export default function App() {
     </div>
   );
 
+  const TopTabs = () => {
+    const tabs = [
+      { key: "add-supply", label: "Add Supply", adminOnly: true },
+      { key: "transactions", label: "Release / Stock In", adminOnly: true },
+      { key: "items", label: "Items" },
+      { key: "recycle-bin", label: "Recycle Bin", adminOnly: true },
+      { key: "history", label: "Transaction History" },
+    ];
+
+    return (
+      <div style={styles.topTabsWrap}>
+        {tabs
+          .filter((tab) => !tab.adminOnly || isAdmin)
+          .map((tab) => {
+            const active = currentSection === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setCurrentSection(tab.key)}
+                style={{
+                  ...styles.topTab,
+                  ...(active ? styles.topTabActive : {}),
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+      </div>
+    );
+  };
+
   if (authLoading) {
     return (
       <div style={styles.page}>
@@ -1911,7 +1815,16 @@ export default function App() {
               margin: "0 auto",
             }}
           >
-            <h2 style={styles.cardTitle}>
+            <h2
+              style={{
+                margin: "0 0 16px 0",
+                fontSize: 18,
+                fontWeight: 800,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
               <ShieldCheck size={18} />
               Login
             </h2>
@@ -1958,12 +1871,6 @@ export default function App() {
     );
   }
 
-  const isMobile = window.innerWidth <= 768;
-  const gridStyle = {
-    ...styles.grid,
-    gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
-  };
-
   return (
     <div style={styles.page}>
       <div style={styles.shell}>
@@ -1986,7 +1893,7 @@ export default function App() {
             <button
               type="button"
               style={styles.statsPillButton}
-              onClick={() => scrollToSection(itemsSectionRef, "items")}
+              onClick={() => setCurrentSection("items")}
               title="Go to Items section"
             >
               <Package2 size={14} />
@@ -2002,7 +1909,7 @@ export default function App() {
               <button
                 type="button"
                 style={styles.statsPillButton}
-                onClick={() => scrollToSection(binSectionRef, "recycle-bin")}
+                onClick={() => setCurrentSection("recycle-bin")}
                 title="Go to Recycle Bin section"
               >
                 <Archive size={14} />
@@ -2011,8 +1918,6 @@ export default function App() {
             )}
           </div>
         </motion.div>
-
-        <BreadcrumbNavigation />
 
         <div style={styles.header}>
           <div style={styles.headerLeft}>
@@ -2104,221 +2009,246 @@ export default function App() {
         {message?.type === "error" && <div style={styles.error}>{message.text}</div>}
         {message?.type === "ok" && <div style={styles.ok}>{message.text}</div>}
 
-        <div style={gridStyle}>
-          {isAdmin && (
-            <motion.div
-              ref={addSupplySectionRef}
-              style={styles.card}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.05 }}
+        <TopTabs />
+
+        {isAdmin && currentSection === "add-supply" && (
+          <motion.div
+            style={styles.card}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+          >
+            <h2
+              style={{
+                margin: "0 0 16px 0",
+                fontSize: 18,
+                fontWeight: 800,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
             >
-              <h2 style={styles.cardTitle}>
-                <Plus size={18} />
-                Add Supply
-              </h2>
+              <Plus size={18} />
+              Add Supply
+            </h2>
 
-              <form onSubmit={addItem}>
-                <div style={styles.field}>
-                  <div style={styles.label}>Item name</div>
-                  <input
-                    style={styles.input}
-                    value={newName}
-                    onChange={(e) => {
-                      setNewName(e.target.value);
-                      setShowSuggestions(true);
-                    }}
-                    onFocus={() => setShowSuggestions(true)}
-                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                    placeholder="Enter item name..."
-                  />
-                  {showSuggestions && suggestions.length > 0 && (
-                    <div style={styles.autocompleteSuggestions}>
-                      {suggestions.map((suggestion, index) => (
-                        <div
-                          key={index}
-                          style={styles.suggestionItem}
-                          onClick={() => {
-                            setNewName(suggestion);
-                            setShowSuggestions(false);
-                          }}
-                          onMouseEnter={(e) => {
-                            e.target.style.background =
-                              theme === "dark"
-                                ? "rgba(255,255,255,0.1)"
-                                : "rgba(0,0,0,0.05)";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.background = "transparent";
-                          }}
-                        >
-                          {suggestion}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div style={styles.row}>
-                  <div style={styles.field}>
-                    <div style={styles.label}>Initial quantity</div>
-                    <input
-                      style={styles.input}
-                      value={newQty}
-                      onChange={(e) => setNewQty(digitsOnly(e.target.value))}
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      placeholder="0"
-                    />
-                  </div>
-
-                  <div style={styles.field}>
-                    <div style={styles.label}>Unit</div>
-                    <select
-                      style={styles.select}
-                      value={newUnit}
-                      onChange={(e) => setNewUnit(e.target.value)}
-                    >
-                      {UNIT_OPTIONS.map((unit) => (
-                        <option key={unit} value={unit}>
-                          {unit === "others" ? "Others" : unit}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {newUnit === "others" && (
-                  <div style={styles.field}>
-                    <div style={styles.label}>Specify unit</div>
-                    <input
-                      style={styles.input}
-                      value={customUnit}
-                      onChange={(e) => setCustomUnit(e.target.value)}
-                      placeholder="e.g., tray"
-                    />
+            <form onSubmit={addItem}>
+              <div style={styles.field}>
+                <div style={styles.label}>Item name</div>
+                <input
+                  style={styles.input}
+                  value={newName}
+                  onChange={(e) => {
+                    setNewName(e.target.value);
+                    setShowSuggestions(true);
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                  placeholder="Enter item name..."
+                />
+                {showSuggestions && suggestions.length > 0 && (
+                  <div style={styles.autocompleteSuggestions}>
+                    {suggestions.map((suggestion, index) => (
+                      <div
+                        key={index}
+                        style={styles.suggestionItem}
+                        onClick={() => {
+                          setNewName(suggestion);
+                          setShowSuggestions(false);
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background =
+                            theme === "dark"
+                              ? "rgba(255,255,255,0.08)"
+                              : "rgba(0,0,0,0.05)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = "transparent";
+                        }}
+                      >
+                        {suggestion}
+                      </div>
+                    ))}
                   </div>
                 )}
+              </div>
 
+              <div style={styles.row}>
                 <div style={styles.field}>
-                  <div style={styles.label}>Low stock threshold</div>
+                  <div style={styles.label}>Initial quantity</div>
                   <input
                     style={styles.input}
-                    value={newMin}
-                    onChange={(e) => setNewMin(digitsOnly(e.target.value))}
+                    value={newQty}
+                    onChange={(e) => setNewQty(digitsOnly(e.target.value))}
                     inputMode="numeric"
                     pattern="[0-9]*"
                     placeholder="0"
                   />
                 </div>
 
-                <div style={styles.buttonRow}>
-                  <FancyButton
-                    style={styles.btnPrimary}
-                    type="submit"
-                    icon={<Plus size={16} />}
-                  >
-                    Add Item
-                  </FancyButton>
-                </div>
-              </form>
-            </motion.div>
-          )}
-
-          {isAdmin && (
-            <motion.div
-              ref={txnSectionRef}
-              style={styles.card}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.1 }}
-            >
-              <h2 style={styles.cardTitle}>
-                <ArrowDownUp size={18} />
-                Release / Stock In
-              </h2>
-
-              <form onSubmit={applyTxn}>
                 <div style={styles.field}>
-                  <div style={styles.label}>Select item</div>
+                  <div style={styles.label}>Unit</div>
                   <select
                     style={styles.select}
-                    value={selectedItemId}
-                    onChange={(e) => setSelectedItemId(e.target.value)}
+                    value={newUnit}
+                    onChange={(e) => setNewUnit(e.target.value)}
                   >
-                    <option value="" disabled>
-                      -- choose item --
-                    </option>
-                    {items.map((it) => (
-                      <option key={it.id} value={it.id}>
-                        {it.name} ({it.quantity} {it.unit})
+                    {UNIT_OPTIONS.map((unit) => (
+                      <option key={unit} value={unit}>
+                        {unit === "others" ? "Others" : unit}
                       </option>
                     ))}
                   </select>
                 </div>
+              </div>
 
-                <div style={styles.row}>
-                  <div style={styles.field}>
-                    <div style={styles.label}>Transaction</div>
-                    <select
-                      style={styles.select}
-                      value={txnType}
-                      onChange={(e) => setTxnType(e.target.value)}
-                    >
-                      <option value="OUT">Stock Out (Release)</option>
-                      <option value="IN">Stock In (Add)</option>
-                    </select>
-                  </div>
+              {newUnit === "others" && (
+                <div style={styles.field}>
+                  <div style={styles.label}>Specify unit</div>
+                  <input
+                    style={styles.input}
+                    value={customUnit}
+                    onChange={(e) => setCustomUnit(e.target.value)}
+                    placeholder="e.g., tray"
+                  />
+                </div>
+              )}
 
-                  <div style={styles.field}>
-                    <div style={styles.label}>Quantity</div>
-                    <input
-                      style={styles.input}
-                      value={txnQty}
-                      onChange={(e) => setTxnQty(digitsOnly(e.target.value))}
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      placeholder="e.g., 50"
-                    />
-                  </div>
+              <div style={styles.field}>
+                <div style={styles.label}>Low stock threshold</div>
+                <input
+                  style={styles.input}
+                  value={newMin}
+                  onChange={(e) => setNewMin(digitsOnly(e.target.value))}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  placeholder="0"
+                />
+              </div>
+
+              <div style={styles.buttonRow}>
+                <FancyButton
+                  style={styles.btnPrimary}
+                  type="submit"
+                  icon={<Plus size={16} />}
+                >
+                  Add Item
+                </FancyButton>
+              </div>
+            </form>
+          </motion.div>
+        )}
+
+        {isAdmin && currentSection === "transactions" && (
+          <motion.div
+            style={styles.card}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+          >
+            <h2
+              style={{
+                margin: "0 0 16px 0",
+                fontSize: 18,
+                fontWeight: 800,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <ArrowDownUp size={18} />
+              Release / Stock In
+            </h2>
+
+            <form onSubmit={applyTxn}>
+              <div style={styles.field}>
+                <div style={styles.label}>Select item</div>
+                <select
+                  style={styles.select}
+                  value={selectedItemId}
+                  onChange={(e) => setSelectedItemId(e.target.value)}
+                >
+                  <option value="" disabled>
+                    -- choose item --
+                  </option>
+                  {items.map((it) => (
+                    <option key={it.id} value={it.id}>
+                      {it.name} ({it.quantity} {it.unit})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={styles.row}>
+                <div style={styles.field}>
+                  <div style={styles.label}>Transaction</div>
+                  <select
+                    style={styles.select}
+                    value={txnType}
+                    onChange={(e) => setTxnType(e.target.value)}
+                  >
+                    <option value="OUT">Stock Out (Release)</option>
+                    <option value="IN">Stock In (Add)</option>
+                  </select>
                 </div>
 
                 <div style={styles.field}>
-                  <div style={styles.label}>Note</div>
+                  <div style={styles.label}>Quantity</div>
                   <input
                     style={styles.input}
-                    value={txnNote}
-                    onChange={(e) => setTxnNote(e.target.value)}
-                    placeholder='e.g., "Used for printing"'
+                    value={txnQty}
+                    onChange={(e) => setTxnQty(digitsOnly(e.target.value))}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="e.g., 50"
                   />
                 </div>
-
-                <div style={styles.buttonRow}>
-                  <FancyButton
-                    style={styles.btnPrimary}
-                    type="submit"
-                    icon={<ArrowDownUp size={16} />}
-                  >
-                    Save Transaction
-                  </FancyButton>
-                </div>
-              </form>
-
-              <div style={styles.helperText}>
-                Example: If you added <b>100</b> then Stock Out <b>50</b>, remaining becomes{" "}
-                <b>50</b>.
               </div>
-            </motion.div>
-          )}
 
+              <div style={styles.field}>
+                <div style={styles.label}>Note</div>
+                <input
+                  style={styles.input}
+                  value={txnNote}
+                  onChange={(e) => setTxnNote(e.target.value)}
+                  placeholder='e.g., "Used for printing"'
+                />
+              </div>
+
+              <div style={styles.buttonRow}>
+                <FancyButton
+                  style={styles.btnPrimary}
+                  type="submit"
+                  icon={<ArrowDownUp size={16} />}
+                >
+                  Save Transaction
+                </FancyButton>
+              </div>
+            </form>
+
+            <div style={styles.helperText}>
+              Example: If you added <b>100</b> then Stock Out <b>50</b>, remaining becomes <b>50</b>.
+            </div>
+          </motion.div>
+        )}
+
+        {currentSection === "items" && (
           <motion.div
-            ref={itemsSectionRef}
-            style={{ ...styles.card, ...styles.cardFull }}
+            style={styles.card}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.15 }}
+            transition={{ duration: 0.35 }}
           >
-            <h2 style={styles.cardTitle}>
+            <h2
+              style={{
+                margin: "0 0 16px 0",
+                fontSize: 18,
+                fontWeight: 800,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
               <Package2 size={18} />
               Items
               {activeFilter !== "all" && (
@@ -2548,107 +2478,126 @@ export default function App() {
               </table>
             </div>
           </motion.div>
+        )}
 
-          {isAdmin && (
-            <motion.div
-              ref={binSectionRef}
-              style={{ ...styles.card, ...styles.cardFull }}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: 0.18 }}
-            >
-              <h2 style={styles.cardTitle}>
-                <Archive size={18} />
-                Recycle Bin
-              </h2>
-
-              <div style={styles.row}>
-                <div style={styles.field}>
-                  <div style={styles.label}>Search deleted items</div>
-                  <div style={{ position: "relative" }}>
-                    <Search
-                      size={16}
-                      style={{
-                        position: "absolute",
-                        left: 14,
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        color: "#64748b",
-                      }}
-                    />
-                    <input
-                      style={{ ...styles.input, paddingLeft: 40 }}
-                      value={binSearch}
-                      onChange={(e) => setBinSearch(e.target.value)}
-                      placeholder="Search deleted item name..."
-                    />
-                  </div>
-                </div>
-                <div />
-              </div>
-
-              <div style={styles.tableWrap}>
-                <table style={styles.table}>
-                  <thead>
-                    <tr>
-                      <th style={styles.th}>Name</th>
-                      <th style={styles.th}>Qty</th>
-                      <th style={styles.th}>Unit</th>
-                      <th style={styles.th}>Deleted</th>
-                      <th style={styles.th}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredDeletedItems.length === 0 ? (
-                      <tr>
-                        <td style={styles.td} colSpan={5}>
-                          Recycle Bin is empty.
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredDeletedItems.map((it) => (
-                        <tr key={it.id}>
-                          <td style={styles.td}>{it.name}</td>
-                          <td style={styles.td}>{it.quantity}</td>
-                          <td style={styles.td}>{it.unit}</td>
-                          <td style={styles.td}>{formatDate(it.deleted_at)}</td>
-                          <td style={styles.td}>
-                            <div style={styles.buttonRow}>
-                              <FancyButton
-                                type="button"
-                                style={styles.btnPrimary}
-                                onClick={() => restoreItem(it.id)}
-                                icon={<RotateCcw size={15} />}
-                              >
-                                Restore
-                              </FancyButton>
-
-                              <FancyButton
-                                type="button"
-                                style={styles.btnDanger}
-                                onClick={() => deleteForever(it.id)}
-                                icon={<Trash2 size={15} />}
-                              >
-                                Delete Forever
-                              </FancyButton>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </motion.div>
-          )}
-
+        {isAdmin && currentSection === "recycle-bin" && (
           <motion.div
-            style={{ ...styles.card, ...styles.cardFull }}
+            style={styles.card}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.2 }}
+            transition={{ duration: 0.35 }}
           >
-            <h2 style={styles.cardTitle}>
+            <h2
+              style={{
+                margin: "0 0 16px 0",
+                fontSize: 18,
+                fontWeight: 800,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <Archive size={18} />
+              Recycle Bin
+            </h2>
+
+            <div style={styles.row}>
+              <div style={styles.field}>
+                <div style={styles.label}>Search deleted items</div>
+                <div style={{ position: "relative" }}>
+                  <Search
+                    size={16}
+                    style={{
+                      position: "absolute",
+                      left: 14,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      color: "#64748b",
+                    }}
+                  />
+                  <input
+                    style={{ ...styles.input, paddingLeft: 40 }}
+                    value={binSearch}
+                    onChange={(e) => setBinSearch(e.target.value)}
+                    placeholder="Search deleted item name..."
+                  />
+                </div>
+              </div>
+              <div />
+            </div>
+
+            <div style={styles.tableWrap}>
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>Name</th>
+                    <th style={styles.th}>Qty</th>
+                    <th style={styles.th}>Unit</th>
+                    <th style={styles.th}>Deleted</th>
+                    <th style={styles.th}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredDeletedItems.length === 0 ? (
+                    <tr>
+                      <td style={styles.td} colSpan={5}>
+                        Recycle Bin is empty.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredDeletedItems.map((it) => (
+                      <tr key={it.id}>
+                        <td style={styles.td}>{it.name}</td>
+                        <td style={styles.td}>{it.quantity}</td>
+                        <td style={styles.td}>{it.unit}</td>
+                        <td style={styles.td}>{formatDate(it.deleted_at)}</td>
+                        <td style={styles.td}>
+                          <div style={styles.buttonRow}>
+                            <FancyButton
+                              type="button"
+                              style={styles.btnPrimary}
+                              onClick={() => restoreItem(it.id)}
+                              icon={<RotateCcw size={15} />}
+                            >
+                              Restore
+                            </FancyButton>
+
+                            <FancyButton
+                              type="button"
+                              style={styles.btnDanger}
+                              onClick={() => deleteForever(it.id)}
+                              icon={<Trash2 size={15} />}
+                            >
+                              Delete Forever
+                            </FancyButton>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        )}
+
+        {currentSection === "history" && (
+          <motion.div
+            style={styles.card}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+          >
+            <h2
+              style={{
+                margin: "0 0 16px 0",
+                fontSize: 18,
+                fontWeight: 800,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
               <Activity size={18} />
               Transaction History
             </h2>
@@ -2722,7 +2671,7 @@ export default function App() {
 
             <div style={styles.footer}>Data is saved in Supabase (Postgres).</div>
           </motion.div>
-        </div>
+        )}
 
         {showScrollTop && (
           <motion.button
