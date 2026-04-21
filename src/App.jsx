@@ -692,6 +692,116 @@ function getStyles(theme) {
       cursor: "pointer",
       accentColor: "#8fcd67",
     },
+
+    loginPage: {
+      minHeight: "100vh",
+      display: "grid",
+      gridTemplateColumns: "1.1fr 1px 1fr",
+      backgroundImage:
+        'linear-gradient(rgba(15,61,30,0.45), rgba(23,97,43,0.45)), url("/inventory-bg.png")',
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+      position: "relative",
+      overflow: "hidden",
+    },
+
+    loginPageBlur: {
+      position: "absolute",
+      inset: 0,
+      backdropFilter: "blur(10px)",
+      WebkitBackdropFilter: "blur(10px)",
+      background: "rgba(0,0,0,0.08)",
+      zIndex: 0,
+    },
+
+    loginLeft: {
+      position: "relative",
+      padding: "36px 34px",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      background: "transparent",
+    },
+
+    loginLogo: {
+      width: 170,
+      height: 170,
+      objectFit: "cover",
+      borderRadius: "50%",
+      background: "#fff",
+    },
+
+    loginLeftText: {
+      fontSize: "clamp(48px, 7vw, 92px)",
+      fontWeight: 800,
+      lineHeight: 0.95,
+      color: "#ffffff",
+      letterSpacing: "-0.05em",
+      maxWidth: 520,
+      marginBottom: 40,
+    },
+
+    loginAccent: {
+      color: "#dff7cf",
+    },
+
+    loginDivider: {
+      width: 1,
+      background: "rgba(255,255,255,0.16)",
+    },
+
+    loginRight: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "40px 70px",
+      background: "transparent",
+    },
+
+    loginCardModern: {
+      width: "100%",
+      maxWidth: 520,
+      background: "rgba(8, 30, 15, 0.24)",
+      border: "1px solid rgba(255,255,255,0.12)",
+      borderRadius: 24,
+      padding: 28,
+      backdropFilter: "blur(14px)",
+      boxShadow: "0 20px 50px rgba(0,0,0,0.18)",
+    },
+
+    loginTitleModern: {
+      fontSize: 34,
+      fontWeight: 700,
+      color: "#ffffff",
+      margin: "0 0 24px 0",
+    },
+
+    loginInputModern: {
+      width: "100%",
+      padding: "18px 20px",
+      borderRadius: 18,
+      border: "1px solid rgba(255,255,255,0.14)",
+      outline: "none",
+      background: "rgba(255,255,255,0.92)",
+      color: "#111827",
+      fontSize: 18,
+      boxSizing: "border-box",
+    },
+
+    loginButtonModern: {
+      width: "100%",
+      marginTop: 10,
+      padding: "16px 20px",
+      borderRadius: 999,
+      border: "1px solid rgba(255,255,255,0.18)",
+      background: "linear-gradient(180deg, #dff7cf 0%, #8fcd67 100%)",
+      color: "#12361c",
+      fontSize: 20,
+      fontWeight: 700,
+      cursor: "pointer",
+      boxShadow: "0 10px 24px rgba(0,0,0,0.18)",
+    },
   };
 }
 
@@ -1142,7 +1252,10 @@ export default function App() {
         }
 
         await refreshData();
-        showMessage("ok", `Imported ${successCount} items successfully. Failed: ${errorCount}`);
+        showMessage(
+          "ok",
+          `Imported ${successCount} items successfully. Failed: ${errorCount}`
+        );
       } catch (error) {
         console.error("Import error:", error);
         showMessage("error", `Import failed: ${error.message}`);
@@ -1171,11 +1284,15 @@ export default function App() {
     switch (activeFilter) {
       case "low-stock":
         filtered = filtered.filter(
-          (it) => Number(it.quantity) <= Number(it.min_level) && Number(it.min_level) > 0
+          (it) =>
+            Number(it.quantity) <= Number(it.min_level) &&
+            Number(it.min_level) > 0
         );
         break;
       case "in-stock":
-        filtered = filtered.filter((it) => Number(it.quantity) > Number(it.min_level));
+        filtered = filtered.filter(
+          (it) => Number(it.quantity) > Number(it.min_level)
+        );
         break;
       case "critical":
         filtered = filtered.filter((it) => Number(it.quantity) === 0);
@@ -1796,74 +1913,53 @@ export default function App() {
 
   if (!session) {
     return (
-      <div style={styles.page}>
-        <div style={styles.shell}>
-          <motion.div
-            style={styles.hero}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45 }}
-          >
-            <div style={styles.heroGlow} />
-            <h1 style={styles.heroTitle}>RPBDD SUPPLIES</h1>
-          </motion.div>
+      <div style={styles.loginPage}>
+        <div style={styles.loginPageBlur} />
 
-          <div
-            style={{
-              ...styles.card,
-              maxWidth: 460,
-              margin: "0 auto",
-            }}
-          >
-            <h2
-              style={{
-                margin: "0 0 16px 0",
-                fontSize: 18,
-                fontWeight: 800,
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <ShieldCheck size={18} />
-              Login
-            </h2>
+        <div style={{ ...styles.loginLeft, zIndex: 1 }}>
+          <img src="/dar-logo.jpeg" alt="DAR Logo" style={styles.loginLogo} />
+
+          <div style={styles.loginLeftText}>
+            <div>Make your</div>
+            <div>Supplies</div>
+            <div>Organize</div>
+            <div style={styles.loginAccent}>you need.</div>
+          </div>
+        </div>
+
+        <div style={{ ...styles.loginDivider, position: "relative", zIndex: 1 }} />
+
+        <div style={{ ...styles.loginRight, zIndex: 1 }}>
+          <div style={styles.loginCardModern}>
+            <h2 style={styles.loginTitleModern}>Log in to RPBDD Supplies</h2>
 
             {message?.type === "error" && <div style={styles.error}>{message.text}</div>}
             {message?.type === "ok" && <div style={styles.ok}>{message.text}</div>}
 
             <form onSubmit={handleLogin}>
               <div style={styles.field}>
-                <div style={styles.label}>Email</div>
                 <input
-                  style={styles.input}
+                  style={styles.loginInputModern}
                   type="email"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="Enter your email"
+                  placeholder="Email address"
                 />
               </div>
 
               <div style={styles.field}>
-                <div style={styles.label}>Password</div>
                 <input
-                  style={styles.input}
+                  style={styles.loginInputModern}
                   type="password"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder="Password"
                 />
               </div>
 
-              <div style={styles.buttonRow}>
-                <FancyButton
-                  type="submit"
-                  style={styles.btnPrimary}
-                  icon={<ShieldCheck size={16} />}
-                >
-                  Login
-                </FancyButton>
-              </div>
+              <button type="submit" style={styles.loginButtonModern}>
+                Log in
+              </button>
             </form>
           </div>
         </div>
