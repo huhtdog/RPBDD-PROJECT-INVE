@@ -1922,8 +1922,7 @@ export default function App() {
           <div style={styles.loginLeftText}>
             <div>Make your</div>
             <div>Supplies</div>
-            <div>Organize</div>
-            <div style={styles.loginAccent}>you need.</div>
+            <div>Organized</div>
           </div>
         </div>
 
