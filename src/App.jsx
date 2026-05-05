@@ -882,7 +882,8 @@ export default function App() {
   const [newUnit, setNewUnit] = useState("ream");
   const [customUnit, setCustomUnit] = useState("");
   const [newQty, setNewQty] = useState("0");
-  const [newMin, setNewMin] = useState("0");
+  // AUTOMATIC 5 for Low stock threshold
+  const [newMin, setNewMin] = useState("5");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const [selectedItemId, setSelectedItemId] = useState("");
@@ -1135,7 +1136,7 @@ export default function App() {
 
     const newMinLevel = prompt(
       "Enter new minimum stock level for selected items:",
-      "10"
+      "5" // Changed default value to 5
     );
     if (newMinLevel === null) return;
 
@@ -1304,7 +1305,7 @@ export default function App() {
             if (header === "Name") item.name = values[index];
             if (header === "Quantity") item.quantity = parseFloat(values[index]) || 0;
             if (header === "Unit") item.unit = values[index] || "pcs";
-            if (header === "Min Level") item.min_level = parseFloat(values[index]) || 0;
+            if (header === "Min Level") item.min_level = parseFloat(values[index]) || 5; // Default to 5 if missing
           });
 
           if (item.name) {
@@ -1621,7 +1622,10 @@ export default function App() {
         ? normalizeName(customUnit || "pcs")
         : newUnit.trim() || "pcs";
     const qty = toNumber(newQty);
-    const minLevel = toNumber(newMin);
+    // Ensure minLevel defaults to 5 if empty or invalid, but user can edit later
+    let minLevel = toNumber(newMin);
+    if (isNaN(minLevel) || minLevel < 0) minLevel = 5; // Fallback to 5
+    else if (minLevel === 0) minLevel = 0; // Allow 0, but default is 5 in state
 
     if (!name) return showMessage("error", "Item name is required.");
     if (newUnit === "others" && !normalizeName(customUnit)) {
@@ -1630,9 +1634,7 @@ export default function App() {
     if (!Number.isFinite(qty) || qty < 0) {
       return showMessage("error", "Initial quantity must be 0 or more.");
     }
-    if (!Number.isFinite(minLevel) || minLevel < 0) {
-      return showMessage("error", "Min level must be 0 or more.");
-    }
+    // No validation for minLevel other than it being a number, which it is.
 
     const { data: existingItem, error: findError } = await supabase
       .from("items")
@@ -1687,7 +1689,7 @@ export default function App() {
 
     setNewName("");
     setNewQty("0");
-    setNewMin("0");
+    setNewMin("5"); // Reset to automatic 5
     setNewUnit("ream");
     setCustomUnit("");
     setShowSuggestions(false);
@@ -2336,15 +2338,16 @@ export default function App() {
               )}
 
               <div style={styles.field}>
-                <div style={styles.label}>Low stock threshold</div>
+                <div style={styles.label}>Low stock threshold (default: 5)</div>
                 <input
                   style={styles.input}
                   value={newMin}
                   onChange={(e) => setNewMin(digitsOnly(e.target.value))}
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  placeholder="0"
+                  placeholder="5"
                 />
+                <div style={styles.helperText}>Set to 0 if you don't want low stock warnings.</div>
               </div>
 
               <div style={styles.buttonRow}>
